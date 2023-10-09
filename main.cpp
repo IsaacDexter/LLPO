@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <chrono>
+#include "MemoryManager.h"
 
 using namespace std::chrono;
 
@@ -36,16 +37,16 @@ using namespace std::chrono;
 #define maxZ 30.0f
 
 
-class Vec3 {
+class Vector3 {
 public:
     float x, y, z;
 
-    Vec3() : x(0.0f), y(0.0f), z(0.0f) {}
-    Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
+    Vector3() : x(0.0f), y(0.0f), z(0.0f) {}
+    Vector3(float x, float y, float z) : x(x), y(y), z(z) {}
 
     // overload the minus operator
-    Vec3 operator-(const Vec3& other) const {
-        return Vec3(x - other.x, y - other.y, z - other.z);
+    Vector3 operator-(const Vector3& other) const {
+        return Vector3(x - other.x, y - other.y, z - other.z);
     }
 
     // Normalize the vector
@@ -66,10 +67,10 @@ public:
 
 // the box (falling item)
 struct Box {
-    Vec3 position;
-    Vec3 size;
-    Vec3 velocity;
-    Vec3 colour; 
+    Vector3 position;
+    Vector3 size;
+    Vector3 velocity;
+    Vector3 colour; 
 };
 
 
@@ -99,10 +100,11 @@ void initScene(int boxCount) {
 
         boxes.push_back(box);
     }
+
 }
 
 // a ray which is used to tap (by default, remove) a box - see the 'mouse' function for how this is used.
-bool rayBoxIntersection(const Vec3& rayOrigin, const Vec3& rayDirection, const Box& box) {
+bool rayBoxIntersection(const Vector3& rayOrigin, const Vector3& rayDirection, const Box& box) {
     float tMin = (box.position.x - box.size.x / 2.0f - rayOrigin.x) / rayDirection.x;
     float tMax = (box.position.x + box.size.x / 2.0f - rayOrigin.x) / rayDirection.x;
 
@@ -134,7 +136,7 @@ bool rayBoxIntersection(const Vec3& rayOrigin, const Vec3& rayDirection, const B
 }
 
 // used in the 'mouse' tap function to convert a screen point to a point in the world
-Vec3 screenToWorld(int x, int y) {
+Vector3 screenToWorld(int x, int y) {
     GLint viewport[4];
     GLdouble modelview[16];
     GLdouble projection[16];
@@ -151,13 +153,13 @@ Vec3 screenToWorld(int x, int y) {
 
     gluUnProject(winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
 
-    return Vec3((float)posX, (float)posY, (float)posZ);
+    return Vector3((float)posX, (float)posY, (float)posZ);
 }
 
 
 // if two boxes collide, push them away from each other
 void resolveCollision(Box& a, Box& b) {
-    Vec3 normal = { a.position.x - b.position.x, a.position.y - b.position.y, a.position.z - b.position.z };
+    Vector3 normal = { a.position.x - b.position.x, a.position.y - b.position.y, a.position.z - b.position.z };
     float length = std::sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
 
     // Normalize the normal vector
@@ -237,7 +239,7 @@ void updatePhysics(const float deltaTime) {
 }
 
 // draw the sides of the containing area
-void drawQuad(const Vec3& v1, const Vec3& v2, const Vec3& v3, const Vec3& v4) {
+void drawQuad(const Vector3& v1, const Vector3& v2, const Vector3& v3, const Vector3& v4) {
     
     glBegin(GL_QUADS);
     glVertex3f(v1.x, v1.y, v1.z);
@@ -270,27 +272,27 @@ void drawScene() {
 
     // Draw the left side wall
     glColor3f(0.5f, 0.5f, 0.5f); // Set the wall color
-    Vec3 leftSideWallV1(minX, 0.0f, maxZ);
-    Vec3 leftSideWallV2(minX, 50.0f, maxZ);
-    Vec3 leftSideWallV3(minX, 50.0f, minZ);
-    Vec3 leftSideWallV4(minX, 0.0f, minZ);
+    Vector3 leftSideWallV1(minX, 0.0f, maxZ);
+    Vector3 leftSideWallV2(minX, 50.0f, maxZ);
+    Vector3 leftSideWallV3(minX, 50.0f, minZ);
+    Vector3 leftSideWallV4(minX, 0.0f, minZ);
     drawQuad(leftSideWallV1, leftSideWallV2, leftSideWallV3, leftSideWallV4);
 
     // Draw the right side wall
     glColor3f(0.5f, 0.5f, 0.5f); // Set the wall color
-    Vec3 rightSideWallV1(maxX, 0.0f, maxZ);
-    Vec3 rightSideWallV2(maxX, 50.0f, maxZ);
-    Vec3 rightSideWallV3(maxX, 50.0f, minZ);
-    Vec3 rightSideWallV4(maxX, 0.0f, minZ);
+    Vector3 rightSideWallV1(maxX, 0.0f, maxZ);
+    Vector3 rightSideWallV2(maxX, 50.0f, maxZ);
+    Vector3 rightSideWallV3(maxX, 50.0f, minZ);
+    Vector3 rightSideWallV4(maxX, 0.0f, minZ);
     drawQuad(rightSideWallV1, rightSideWallV2, rightSideWallV3, rightSideWallV4);
 
 
     // Draw the back wall
     glColor3f(0.5f, 0.5f, 0.5f); // Set the wall color
-    Vec3 backWallV1(minX, 0.0f, minZ);
-    Vec3 backWallV2(minX, 50.0f, minZ);
-    Vec3 backWallV3(maxX, 50.0f, minZ);
-    Vec3 backWallV4(maxX, 0.0f, minZ);
+    Vector3 backWallV1(minX, 0.0f, minZ);
+    Vector3 backWallV2(minX, 50.0f, minZ);
+    Vector3 backWallV3(maxX, 50.0f, minZ);
+    Vector3 backWallV4(maxX, 0.0f, minZ);
     drawQuad(backWallV1, backWallV2, backWallV3, backWallV4);
 
     for (const Box& box : boxes) {
@@ -330,14 +332,14 @@ void idle() {
 void mouse(int button, int state, int x, int y) {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
         // Get the camera position and direction
-        Vec3 cameraPosition(LOOKAT_X, LOOKAT_Y, LOOKAT_Z); // Replace with your actual camera position
-        Vec3 cameraDirection(LOOKDIR_X, LOOKDIR_Y, LOOKDIR_Z); // Replace with your actual camera direction
+        Vector3 cameraPosition(LOOKAT_X, LOOKAT_Y, LOOKAT_Z); // Replace with your actual camera position
+        Vector3 cameraDirection(LOOKDIR_X, LOOKDIR_Y, LOOKDIR_Z); // Replace with your actual camera direction
 
         // Get the world coordinates of the clicked point
-        Vec3 clickedWorldPos = screenToWorld(x, y);
+        Vector3 clickedWorldPos = screenToWorld(x, y);
 
         // Calculate the ray direction from the camera position to the clicked point
-        Vec3 rayDirection = clickedWorldPos - cameraPosition;
+        Vector3 rayDirection = clickedWorldPos - cameraPosition;
         rayDirection.normalise();
 
         // Perform a ray-box intersection test and remove the clicked box
@@ -347,7 +349,7 @@ void mouse(int button, int state, int x, int y) {
         for (size_t i = 0; i < boxes.size(); ++i) {
             if (rayBoxIntersection(cameraPosition, rayDirection, boxes[i])) {
                 // Calculate the distance between the camera and the intersected box
-                Vec3 diff = boxes[i].position - cameraPosition;
+                Vector3 diff = boxes[i].position - cameraPosition;
                 float distance = diff.length();
 
                 // Update the clicked box index if this box is closer to the camera
