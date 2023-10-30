@@ -172,12 +172,18 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BoxManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MemoryManager.cpp" />
+    <ClCompile Include="MyObject.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BoxManager.h" />
     <ClInclude Include="Callbacks.h" />
     <ClInclude Include="MemoryManager.h" />
+    <ClInclude Include="MemoryTracker.h" />
+    <ClInclude Include="MyObject.h" />
+    <ClInclude Include="Vector3.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
