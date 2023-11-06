@@ -173,6 +173,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BoxManager.cpp" />
+    <ClCompile Include="CubePhysics.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MemoryManager.cpp" />
     <ClCompile Include="MyObject.cpp" />
@@ -180,6 +181,8 @@
   <ItemGroup>
     <ClInclude Include="BoxManager.h" />
     <ClInclude Include="Callbacks.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="CubePhysics.h" />
     <ClInclude Include="MemoryManager.h" />
     <ClInclude Include="MemoryTracker.h" />
     <ClInclude Include="MyObject.h" />
