@@ -9,16 +9,12 @@
 #include <chrono>
 #include "MemoryManager.h"
 #include "MemoryTracker.h"
+#include <glm.hpp>
+#include "BoxManager.h"
 
 #include "Camera.h"
 
 using namespace std::chrono;
-
-#pragma region ForwardDeclarations
-
-class BoxManager;
-
-#pragma endregion
 
 // these is where the camera is, where it is looking and the bounds of the continaing box. You shouldn't need to alter these
 
@@ -40,18 +36,16 @@ class CubePhysics
 public:
 	CubePhysics();
 	~CubePhysics();
-private:
-	Vector3d ScreenToWorld(int x, int y);
-	void DrawQuad(const Vector3d& v1, const Vector3d& v2, const Vector3d& v3, const Vector3d& v4);
-	void DrawScene();
-	void Init();
 	//GLUT FUNCTIONS
 	void Display();
 	void Idle();
 	void Mouse(int button, int state, int x, int y);
 	void Keyboard(unsigned char key, int x, int y);
-
-
+	void Init();
+private:
+	fvec3 ScreenToWorld(int x, int y);
+	void DrawQuad(const fvec3& v1, const fvec3& v2, const fvec3& v3, const fvec3& v4);
+	void DrawScene();
 private:
 	BoxManager* m_boxes;
 	const unsigned int& m_boxCount = 50;

@@ -3,7 +3,7 @@
 #include "CubePhysics.h"
 
 /* Callback function declarations */
-void keyboard(unsigned char key, int x, int y);
-void display(void);
+void Keyboard(unsigned char key, int x, int y);
+void Display(void);
 
 #endif

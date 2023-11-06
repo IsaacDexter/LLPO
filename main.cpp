@@ -7,15 +7,53 @@
 #include "CubePhysics.h"
 #include <GL/glut.h>
 
+CubePhysics* g_application;
+
+void Keyboard(unsigned char key, int x, int y)
+{
+    g_application->Keyboard(key, x, y);
+}
+
+void Mouse(int button, int state, int x, int y)
+{
+    g_application->Mouse(button, state, x, y);
+}
+
+void Display()
+{
+    g_application->Display();
+}
+
+void Idle()
+{
+    g_application->Idle();
+}
+
 // the main function. 
 int main(int argc, char** argv) 
 {
+    g_application = new CubePhysics();
+
     srand(static_cast<unsigned>(time(0))); // Seed random number generator
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(1920, 1080);
     glutCreateWindow("Simple Physics Simulation");
 
-    CubePhysics();
+    glutKeyboardFunc(Keyboard);
+    glutMouseFunc(Mouse);
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45.0, 800.0 / 600.0, 0.1, 100.0);
+    glMatrixMode(GL_MODELVIEW);
+
+    glutDisplayFunc(Display);
+    glutIdleFunc(Idle);
+
+    g_application->Init();
     return 0;
 }
