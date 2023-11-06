@@ -9,10 +9,9 @@
 #include <chrono>
 #include "MemoryManager.h"
 #include "MemoryTracker.h"
-#include "eigen-3.4.0/Eigen/Dense"
+
 #include "Camera.h"
 
-using Eigen::Vector3d;
 using namespace std::chrono;
 
 #pragma region ForwardDeclarations
