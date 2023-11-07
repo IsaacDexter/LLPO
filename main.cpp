@@ -15,6 +15,7 @@
 #include <ctime>
 #include <chrono>
 #include "MemoryManager.h"
+#include <string>
 
 using namespace std::chrono;
 
@@ -201,7 +202,10 @@ bool checkCollision(const Box& a, const Box& b) {
 // update the physics: gravity, collision test, collision resolution
 void updatePhysics(const float deltaTime) {
     const float floorY = 0.0f;
-
+    
+    //char buffer[100];
+    //sprintf_s(buffer, "DeltaTime = %f\n", deltaTime);
+    //OutputDebugStringA(buffer);
 
     for (Box& box : boxes) {
         // Update velocity due to gravity
