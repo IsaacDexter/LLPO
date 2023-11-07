@@ -2,8 +2,8 @@
 
 struct Camera
 {
-	vec3 lookAt;
-	vec3 lookDir;
+	dvec3 lookAt;
+	dvec3 lookDir;
 	fvec2 x;
 	fvec2 z;
 };

@@ -2,6 +2,7 @@
 
 CubePhysics::CubePhysics()
 {
+    m_boxes = new BoxManager();
 }
 
 CubePhysics::~CubePhysics()
@@ -9,7 +10,7 @@ CubePhysics::~CubePhysics()
 }
 
 // used in the 'mouse' tap function to convert a screen point to a point in the world
-vec3 CubePhysics::ScreenToWorld(int x, int y)
+dvec3 CubePhysics::ScreenToWorld(int x, int y)
 {
     GLint viewport[4];
     GLdouble modelview[16];
@@ -27,11 +28,11 @@ vec3 CubePhysics::ScreenToWorld(int x, int y)
 
     gluUnProject(winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
 
-    return vec3((float)posX, (float)posY, (float)posZ);
+    return dvec3((float)posX, (float)posY, (float)posZ);
 }
 
 //Draw the sides of the containing area
-void CubePhysics::DrawQuad(const vec3& v1, const vec3& v2, const vec3& v3, const vec3& v4)
+void CubePhysics::DrawQuad(const dvec3& v1, const dvec3& v2, const dvec3& v3, const dvec3& v4)
 {
     glBegin(GL_QUADS);
     glVertex3f(v1.x, v1.y, v1.z);
@@ -50,27 +51,27 @@ void CubePhysics::DrawScene()
 
     // Draw the left side wall
     glColor3f(0.5f, 0.5f, 0.5f); // Set the wall color
-    vec3 leftSideWallV1(minX, 0.0f, maxZ);
-    vec3 leftSideWallV2(minX, 50.0f, maxZ);
-    vec3 leftSideWallV3(minX, 50.0f, minZ);
-    vec3 leftSideWallV4(minX, 0.0f, minZ);
+    dvec3 leftSideWallV1(minX, 0.0f, maxZ);
+    dvec3 leftSideWallV2(minX, 50.0f, maxZ);
+    dvec3 leftSideWallV3(minX, 50.0f, minZ);
+    dvec3 leftSideWallV4(minX, 0.0f, minZ);
     DrawQuad(leftSideWallV1, leftSideWallV2, leftSideWallV3, leftSideWallV4);
 
     // Draw the right side wall
     glColor3f(0.5f, 0.5f, 0.5f); // Set the wall color
-    vec3 rightSideWallV1(maxX, 0.0f, maxZ);
-    vec3 rightSideWallV2(maxX, 50.0f, maxZ);
-    vec3 rightSideWallV3(maxX, 50.0f, minZ);
-    vec3 rightSideWallV4(maxX, 0.0f, minZ);
+    dvec3 rightSideWallV1(maxX, 0.0f, maxZ);
+    dvec3 rightSideWallV2(maxX, 50.0f, maxZ);
+    dvec3 rightSideWallV3(maxX, 50.0f, minZ);
+    dvec3 rightSideWallV4(maxX, 0.0f, minZ);
     DrawQuad(rightSideWallV1, rightSideWallV2, rightSideWallV3, rightSideWallV4);
 
 
     // Draw the back wall
     glColor3f(0.5f, 0.5f, 0.5f); // Set the wall color
-    vec3 backWallV1(minX, 0.0f, minZ);
-    vec3 backWallV2(minX, 50.0f, minZ);
-    vec3 backWallV3(maxX, 50.0f, minZ);
-    vec3 backWallV4(maxX, 0.0f, minZ);
+    dvec3 backWallV1(minX, 0.0f, minZ);
+    dvec3 backWallV2(minX, 50.0f, minZ);
+    dvec3 backWallV3(maxX, 50.0f, minZ);
+    dvec3 backWallV4(maxX, 0.0f, minZ);
     DrawQuad(backWallV1, backWallV2, backWallV3, backWallV4);
 
     m_boxes->Draw();
@@ -78,7 +79,6 @@ void CubePhysics::DrawScene()
 
 void CubePhysics::Init()
 {
-    m_boxes = new BoxManager();
     m_boxes->Init(m_boxCount);
     
 }
@@ -102,8 +102,8 @@ void CubePhysics::Idle() {
     static auto last = steady_clock::now();
     auto old = last;
     last = steady_clock::now();
-    const duration<float> frameTime = last - old;
-    float deltaTime = frameTime.count();
+    const duration<double> frameTime = last - old;
+    double deltaTime = frameTime.count();
 
     m_boxes->Update(deltaTime);
 
@@ -115,14 +115,14 @@ void CubePhysics::Mouse(int button, int state, int x, int y)
 {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
         // Get the camera position and direction
-        vec3 cameraPosition(LOOKAT_X, LOOKAT_Y, LOOKAT_Z); // Replace with your actual camera position
-        vec3 cameraDirection(LOOKDIR_X, LOOKDIR_Y, LOOKDIR_Z); // Replace with your actual camera direction
+        dvec3 cameraPosition(LOOKAT_X, LOOKAT_Y, LOOKAT_Z); // Replace with your actual camera position
+        dvec3 cameraDirection(LOOKDIR_X, LOOKDIR_Y, LOOKDIR_Z); // Replace with your actual camera direction
 
         // Get the world coordinates of the clicked point
-        vec3 clickedWorldPos = ScreenToWorld(x, y);
+        dvec3 clickedWorldPos = ScreenToWorld(x, y);
 
         // Calculate the ray direction from the camera position to the clicked point
-        vec3 rayDirection = clickedWorldPos - cameraPosition;
+        dvec3 rayDirection = clickedWorldPos - cameraPosition;
         normalize(rayDirection);
 
         Box box = m_boxes->SelectBox(cameraPosition, rayDirection);
@@ -140,7 +140,7 @@ void CubePhysics::Keyboard(unsigned char key, int x, int y)
     {
     case ' ':
     {
-        m_boxes->ApplyImpulse(vec3(0.0f, 20.0f, 0.0f));
+        m_boxes->ApplyImpulse(dvec3(0.0f, 20.0f, 0.0f));
         break;
     }
     case 'd':

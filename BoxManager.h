@@ -30,26 +30,26 @@ private:
     /// <summary>Dampening factor (0.9 = 10% energy reduction)</summary>
     const double dampening = 0.9;
 
-    std::array<vec3, maximum>* positions;
-    std::array<vec3, maximum>* sizes;
-    std::array<vec3, maximum>* velocities;
-    std::array<vec3, maximum>* colors;
+    std::array<dvec3, maximum>* positions;
+    std::array<dvec3, maximum>* sizes;
+    std::array<dvec3, maximum>* velocities;
+    std::array<dvec3, maximum>* colors;
     std::array<bool, maximum>* active;
 
 public:
     BoxManager();
 
-    void Update(const float deltaTime);
+    void Update(const double deltaTime);
     // draw the physics objects
     void Draw();
 
 
     void Init(const unsigned int& count);
     // a ray which is used to tap (by default, remove) a box - see the 'mouse' function for how this is used.
-    bool RayBoxIntersection(const vec3& rayOrigin, const vec3& rayDirection, Box i);
+    bool RayBoxIntersection(const dvec3& rayOrigin, const dvec3& rayDirection, Box i);
 
     void ResolveCollision(Box a, Box b);
-    Box SelectBox(const vec3& rayOrigin, const vec3& rayDirection);
+    Box SelectBox(const dvec3& rayOrigin, const dvec3& rayDirection);
     bool RemoveBox(Box a);
 
     /// <summary>Are these two boxes colliding?</summary>
@@ -58,7 +58,7 @@ public:
     /// <returns>Whether or not the two boxes overlap</returns>
     bool CheckCollision(Box a, Box b);
 
-    void ApplyImpulse(const vec3& impulse);
-    void ApplyImpulse(const vec3& impulse, Box a);
+    void ApplyImpulse(const dvec3& impulse);
+    void ApplyImpulse(const dvec3& impulse, Box a);
 };
 

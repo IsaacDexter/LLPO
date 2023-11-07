@@ -1,23 +1,95 @@
 ﻿  BoxManager.cpp
-C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(52,56): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(96,78): warning C4244: 'argument': conversion from 'T' to 'GLfloat', possible loss of data
           with
           [
-              T=float
+              T=glm::f64
           ]
-C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(58,56): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(96,58): warning C4244: 'argument': conversion from 'T' to 'GLfloat', possible loss of data
           with
           [
-              T=float
+              T=glm::f64
           ]
-C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(62,56): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(96,38): warning C4244: 'argument': conversion from 'T' to 'GLfloat', possible loss of data
           with
           [
-              T=float
+              T=glm::f64
           ]
-C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(198,28): warning C4244: 'initializing': conversion from 'glm::vec<3,float,glm::packed_highp>::length_type' to 'float', possible loss of data
-  CubePhysics.cpp
-  main.cpp
-  Generating Code...
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(97,52): warning C4838: conversion from 'T' to 'GLfloat' requires a narrowing conversion
+          with
+          [
+              T=glm::f64
+          ]
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(97,52): warning C4244: 'initializing': conversion from 'T' to 'GLfloat', possible loss of data
+          with
+          [
+              T=glm::f64
+          ]
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(97,69): warning C4838: conversion from 'T' to 'GLfloat' requires a narrowing conversion
+          with
+          [
+              T=glm::f64
+          ]
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(97,69): warning C4244: 'initializing': conversion from 'T' to 'GLfloat', possible loss of data
+          with
+          [
+              T=glm::f64
+          ]
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(97,86): warning C4838: conversion from 'T' to 'GLfloat' requires a narrowing conversion
+          with
+          [
+              T=glm::f64
+          ]
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(97,86): warning C4244: 'initializing': conversion from 'T' to 'GLfloat', possible loss of data
+          with
+          [
+              T=glm::f64
+          ]
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(99,62): warning C4244: 'argument': conversion from 'T' to 'GLfloat', possible loss of data
+          with
+          [
+              T=glm::f64
+          ]
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(99,46): warning C4244: 'argument': conversion from 'T' to 'GLfloat', possible loss of data
+          with
+          [
+              T=glm::f64
+          ]
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(99,30): warning C4244: 'argument': conversion from 'T' to 'GLfloat', possible loss of data
+          with
+          [
+              T=glm::f64
+          ]
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(127,17): warning C4244: 'initializing': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=glm::f64
+          ]
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(128,17): warning C4244: 'initializing': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=glm::f64
+          ]
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(132,17): warning C4244: 'initializing': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=glm::f64
+          ]
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(133,17): warning C4244: 'initializing': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=glm::f64
+          ]
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(146,17): warning C4244: 'initializing': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=glm::f64
+          ]
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(147,17): warning C4244: 'initializing': conversion from 'T' to 'float', possible loss of data
+          with
+          [
+              T=glm::f64
+          ]
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(198,28): warning C4244: 'initializing': conversion from 'glm::vec<3,glm::f64,glm::packed_highp>::length_type' to 'float', possible loss of data
 C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(203): warning C4172: returning address of local variable or temporary: a
 C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(208): warning C4172: returning address of local variable or temporary
   Physio.vcxproj -> C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\Debug\Physio.exe
