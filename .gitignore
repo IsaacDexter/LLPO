@@ -4,3 +4,5 @@
 .vs/Physio/v17/ipch/AutoPCH/f8434ccde79176c2/MEMORYMANAGER.ipch
 .vs/Physio/v17/ipch/AutoPCH/5e17d449859744f7/MAIN.ipch
 .vs/Physio/v17/ipch/AutoPCH/234dbe796dad8bf6/BOXMANAGER.ipch
+*.ipch
+.vs/Physio/v17/ipch/AutoPCH/234dbe796dad8bf6/BOXMANAGER.ipch

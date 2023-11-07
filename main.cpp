@@ -51,9 +51,11 @@ int main(int argc, char** argv)
     gluPerspective(45.0, 800.0 / 600.0, 0.1, 100.0);
     glMatrixMode(GL_MODELVIEW);
 
+    g_application->Init();
     glutDisplayFunc(Display);
     glutIdleFunc(Idle);
 
-    g_application->Init();
+    // it will stick here until the program ends. 
+    glutMainLoop();
     return 0;
 }

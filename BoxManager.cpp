@@ -14,33 +14,32 @@ void BoxManager::Update(const float& deltaTime)
             continue;
         }
 
-        fvec3& position = positions->at(a);
-        fvec3& velocity = velocities->at(a);
-        fvec3& halfSize = sizes->at(a);
-        halfSize /= 2.0f;
+        //fvec3& position = positions->at(a);
+        //fvec3& velocity = velocities->at(a);
+        //fvec3 halfSize = sizes->at(a) / 2.0f;
 
         //Update velocity due to gravity
         //v = a * t
-        velocity.y += gravity * deltaTime;
+        velocities->at(a).y += gravity * deltaTime;
         //s = v * t
-        position += velocity * deltaTime;
+        positions->at(a) += velocities->at(a) * deltaTime;
 
         //Check for collision with the floor
-        if (position.y - halfSize.y < floorY)
+        if (positions->at(a).y - sizes->at(a).y / 2.0f < floorY)
         {
             //Move the box to sit on the floor and have it bounce up
-            position.y = floorY + halfSize.y;
-            velocity.y = -velocity.y * dampening;
+            positions->at(a).y = floorY + sizes->at(a).y / 2.0f;
+            velocities->at(a).y = -velocities->at(a).y * dampening;
         }
 
         // Check for collision with the walls
-        if (position.x - halfSize.x < minX || position.x + halfSize.x > maxX)
+        if (positions->at(a).x - sizes->at(a).x / 2.0f < minX || positions->at(a).x + sizes->at(a).x / 2.0f > maxX)
         {
-            velocity.x = -velocity.x * dampening;
+            velocities->at(a).x = -velocities->at(a).x * dampening;
         }
-        if (position.z - halfSize.z < minZ || position.z + halfSize.z > maxZ)
+        if (positions->at(a).z - sizes->at(a).z / 2.0f < minZ || positions->at(a).z + sizes->at(a).z / 2.0f > maxZ)
         {
-            velocity.z = -velocity.z * dampening;
+            velocities->at(a).z = -velocities->at(a).z * dampening;
         }
 
         //Check collisions with other boxes
@@ -55,6 +54,7 @@ void BoxManager::Update(const float& deltaTime)
             if (CheckCollision(a, b))
             {
                 ResolveCollision(a, b);
+                break;
             }
         }
     }
@@ -69,15 +69,12 @@ void BoxManager::Draw()
         {
             continue;
         }
-        fvec3& position = positions->at(a);
-        fvec3& size = sizes->at(a);
-        fvec3& color = colors->at(a);
 
         glPushMatrix();
-        glTranslatef(position.x, position.y, position.z);
-        GLfloat diffuseMaterial[] = { color.x, color.y, color.z, 1.0f };
+        glTranslatef(positions->at(a).x, positions->at(a).y, positions->at(a).z);
+        GLfloat diffuseMaterial[] = { colors->at(a).x, colors->at(a).y, colors->at(a).z, 1.0f };
         glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuseMaterial);
-        glScalef(size.x, size.y, size.z);
+        glScalef(sizes->at(a).x, sizes->at(a).y, sizes->at(a).z);
         glRotatef(-90, 1, 0, 0);
         glutSolidCube(1.0);
         //glutSolidTeapot(1);
@@ -102,7 +99,7 @@ void BoxManager::Init(const unsigned int& count)
 bool BoxManager::RayBoxIntersection(const fvec3& rayOrigin, const fvec3& rayDirection, Box i)
 {
     fvec3& position = positions->at(i);
-    fvec3& halfSize = sizes->at(i);
+    fvec3 halfSize = sizes->at(i);
     halfSize /= 2.0;
 
     float txMin = (position.x - halfSize.x - rayOrigin.x) / rayDirection.x;
@@ -191,6 +188,10 @@ Box BoxManager::SelectBox(const fvec3& cameraPosition, const fvec3& rayDirection
 
 bool BoxManager::RemoveBox(Box a)
 {
+    if (a < 0 || a > m_count)
+    {
+        return false;
+    }
     active->at(a) = false;
     return true;
 }

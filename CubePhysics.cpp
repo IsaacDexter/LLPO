@@ -80,8 +80,7 @@ void CubePhysics::Init()
 {
     m_boxes = new BoxManager();
     m_boxes->Init(m_boxCount);
-    // it will stick here until the program ends. 
-    glutMainLoop();
+    
 }
 
 void CubePhysics::Display()
@@ -152,6 +151,11 @@ void CubePhysics::Keyboard(unsigned char key, int x, int y)
     case 't':
     {
         throw;
+        break;
+    }
+    case 'u':
+    {
+        m_boxes->Update(1.0f / 60.0f);
         break;
     }
     default:

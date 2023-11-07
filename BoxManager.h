@@ -8,6 +8,7 @@ using namespace glm;
 
 typedef const unsigned int& Box;
 
+
 #define BOX_COUNT 50
 
 #define minX -10.0f
