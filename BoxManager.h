@@ -21,7 +21,7 @@ class BoxManager
 private:
     // this is the number of falling physical items. 
     static const unsigned int maximum = 50;
-    const float gravity = -19.81f;
+    const double gravity = -19.81;
     const float floorY = 0.0f;
     unsigned int m_count = 0;
 

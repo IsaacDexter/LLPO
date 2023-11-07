@@ -36,30 +36,34 @@ void BoxManager::Update(const double deltaTime)
 
         //dvec3& position = positions->at(a);
         //dvec3& velocity = velocities->at(a);
-        //dvec3 halfSize = sizes->at(a) / 2.0f;
+        //dvec3 halfSize = sizes->at(a) / 2.0;
+
+        dvec3& position = positions->at(a);
+        dvec3& velocity = velocities->at(a);
+        dvec3 halfSize = sizes->at(a) / 2.0;
 
         //Update velocity due to gravity
         //v = a * t
-        velocities->at(a).y += gravity * deltaTime;
+        velocity.y += gravity * deltaTime;
         //s = v * t
-        positions->at(a) += velocities->at(a) * deltaTime;
+        position += velocity * deltaTime;
 
         //Check for collision with the floor
-        if (positions->at(a).y - sizes->at(a).y / 2.0f < floorY)
+        if (position.y - sizes->at(a).y / 2.0f < floorY)
         {
             //Move the box to sit on the floor and have it bounce up
-            positions->at(a).y = floorY + sizes->at(a).y / 2.0f;
-            velocities->at(a).y = -velocities->at(a).y * dampening;
+            position.y = floorY + sizes->at(a).y / 2.0f;
+            velocity.y = -velocity.y * dampening;
         }
 
         // Check for collision with the walls
-        if (positions->at(a).x - sizes->at(a).x / 2.0f < minX || positions->at(a).x + sizes->at(a).x / 2.0f > maxX)
+        if (position.x - sizes->at(a).x / 2.0f < minX || position.x + sizes->at(a).x / 2.0f > maxX)
         {
-            velocities->at(a).x = -velocities->at(a).x * dampening;
+            velocity.x = -velocity.x * dampening;
         }
-        if (positions->at(a).z - sizes->at(a).z / 2.0f < minZ || positions->at(a).z + sizes->at(a).z / 2.0f > maxZ)
+        if (position.z - sizes->at(a).z / 2.0f < minZ || position.z + sizes->at(a).z / 2.0f > maxZ)
         {
-            velocities->at(a).z = -velocities->at(a).z * dampening;
+            velocity.z = -velocity.z * dampening;
         }
 
         
@@ -160,7 +164,7 @@ void BoxManager::ResolveCollision(Box a, Box b)
 
     //Find the normal vector
     dvec3 normal = positions->at(a) - positions->at(b);
-    normalize(normal);
+    normal = normalize(normal);
 
     //Compute relative velocity along the normal
     double impulse = dot(relativeVelocity, normal);
@@ -220,7 +224,7 @@ bool BoxManager::RemoveBox(Box a)
 
 bool BoxManager::CheckCollision(Box a, Box b)
 {
-    dvec3 distance = (positions->at(a) - positions->at(b)) * 2.0;
+    dvec3 distance = abs((positions->at(a) - positions->at(b))) * 2.0;
     dvec3 totalSize = sizes->at(a) + sizes->at(b);
 
     return(
