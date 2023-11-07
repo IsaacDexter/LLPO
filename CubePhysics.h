@@ -43,8 +43,8 @@ public:
 	void Keyboard(unsigned char key, int x, int y);
 	void Init();
 private:
-	fvec3 ScreenToWorld(int x, int y);
-	void DrawQuad(const fvec3& v1, const fvec3& v2, const fvec3& v3, const fvec3& v4);
+	vec3 ScreenToWorld(int x, int y);
+	void DrawQuad(const vec3& v1, const vec3& v2, const vec3& v3, const vec3& v4);
 	void DrawScene();
 private:
 	BoxManager* m_boxes;

@@ -1,24 +1,24 @@
 ﻿  BoxManager.cpp
-C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(32,56): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(52,56): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(38,56): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(58,56): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(42,56): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(62,56): warning C4244: '=': conversion from 'double' to 'T', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(176,28): warning C4244: 'initializing': conversion from 'glm::vec<3,float,glm::packed_highp>::length_type' to 'float', possible loss of data
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(198,28): warning C4244: 'initializing': conversion from 'glm::vec<3,float,glm::packed_highp>::length_type' to 'float', possible loss of data
   CubePhysics.cpp
   main.cpp
   Generating Code...
-C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(181): warning C4172: returning address of local variable or temporary: a
-C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(186): warning C4172: returning address of local variable or temporary
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(203): warning C4172: returning address of local variable or temporary: a
+C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\BoxManager.cpp(208): warning C4172: returning address of local variable or temporary
   Physio.vcxproj -> C:\Users\d015349l\Documents\GitHub\physio-2023-24-IsaacDexter\Debug\Physio.exe
   0 File(s) copied

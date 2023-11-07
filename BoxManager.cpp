@@ -2,10 +2,30 @@
 
 BoxManager::BoxManager()
 {
+    positions = new std::array<vec3, maximum>();
+    positions->fill(vec3(0.0f));
+
+    velocities = new std::array<vec3, maximum>();
+    velocities->fill(vec3(0.0f));
+
+    sizes = new std::array<vec3, maximum>();
+    sizes->fill(vec3(0.0f));
+
+    colors = new std::array<vec3, maximum>();
+    colors->fill(vec3(0.0f));
+
+    active = new std::array<bool, maximum>();
+    active->fill(false);
 }
 
-void BoxManager::Update(const float& deltaTime)
+void BoxManager::Update(const float deltaTime)
 {
+
+    char buffer[500];
+
+    sprintf_s(buffer, "DeltaTime = %f, Position = %f, %f, %f, Velocity = %f, %f, %f\n", deltaTime, positions->at(0).x, positions->at(0).y, positions->at(0).z, velocities->at(0).x, velocities->at(0).y, velocities->at(0).z);
+    OutputDebugStringA(buffer);
+
     for (unsigned int a = 0; a < m_count; a++)
     {
         //Early out for inactive boxes (i.e. 'deleted')
@@ -14,9 +34,9 @@ void BoxManager::Update(const float& deltaTime)
             continue;
         }
 
-        //fvec3& position = positions->at(a);
-        //fvec3& velocity = velocities->at(a);
-        //fvec3 halfSize = sizes->at(a) / 2.0f;
+        //vec3& position = positions->at(a);
+        //vec3& velocity = velocities->at(a);
+        //vec3 halfSize = sizes->at(a) / 2.0f;
 
         //Update velocity due to gravity
         //v = a * t
@@ -41,6 +61,8 @@ void BoxManager::Update(const float& deltaTime)
         {
             velocities->at(a).z = -velocities->at(a).z * dampening;
         }
+
+        
 
         //Check collisions with other boxes
         for (unsigned int b = 0; b < m_count; b++)
@@ -88,18 +110,18 @@ void BoxManager::Init(const unsigned int& count)
     m_count = std::min(count, maximum);
     for (unsigned int i = 0; i < m_count; i++)
     {
-        (positions->at(i)) = fvec3(static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f)), 10.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 1.0f)), static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f)));
-        (sizes->at(i)) = fvec3(1.0f, 1.0f, 1.0f);
-        (velocities->at(i)) = fvec3(-1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 2.0f)), 0.0f, 0.0f);
-        (colors->at(i)) = fvec3(static_cast<float>(rand()) / static_cast<float>(RAND_MAX) , static_cast<float>(rand()) / static_cast<float>(RAND_MAX) , static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
+        (positions->at(i)) = vec3(static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f)), 10.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 1.0f)), static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f)));
+        (sizes->at(i)) = vec3(1.0f, 1.0f, 1.0f);
+        (velocities->at(i)) = vec3(-1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 2.0f)), 0.0f, 0.0f);
+        (colors->at(i)) = vec3(static_cast<float>(rand()) / static_cast<float>(RAND_MAX) , static_cast<float>(rand()) / static_cast<float>(RAND_MAX) , static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
         (active->at(i)) = true;
     }
 }
 
-bool BoxManager::RayBoxIntersection(const fvec3& rayOrigin, const fvec3& rayDirection, Box i)
+bool BoxManager::RayBoxIntersection(const vec3& rayOrigin, const vec3& rayDirection, Box i)
 {
-    fvec3& position = positions->at(i);
-    fvec3 halfSize = sizes->at(i);
+    vec3& position = positions->at(i);
+    vec3 halfSize = sizes->at(i);
     halfSize /= 2.0;
 
     float txMin = (position.x - halfSize.x - rayOrigin.x) / rayDirection.x;
@@ -134,10 +156,10 @@ bool BoxManager::RayBoxIntersection(const fvec3& rayOrigin, const fvec3& rayDire
 
 void BoxManager::ResolveCollision(Box a, Box b)
 {
-    fvec3 relativeVelocity = velocities->at(a) - velocities->at(b);
+    vec3 relativeVelocity = velocities->at(a) - velocities->at(b);
 
     //Find the normal vector
-    fvec3 normal = positions->at(a) - positions->at(b);
+    vec3 normal = positions->at(a) - positions->at(b);
     normalize(normal);
 
     //Compute relative velocity along the normal
@@ -158,7 +180,7 @@ void BoxManager::ResolveCollision(Box a, Box b)
     velocities->at(b) -= normal;
 }
 
-Box BoxManager::SelectBox(const fvec3& cameraPosition, const fvec3& rayDirection)
+Box BoxManager::SelectBox(const vec3& cameraPosition, const vec3& rayDirection)
 {
     float minIntersectionDistance = std::numeric_limits<float>::max();
     //Check if any box intersects with the ray
@@ -172,7 +194,7 @@ Box BoxManager::SelectBox(const fvec3& cameraPosition, const fvec3& rayDirection
         if (RayBoxIntersection(cameraPosition, rayDirection, a))
         {
             // Calculate the distance between the camera and the intersected box
-            fvec3 diff = positions->at(a) - cameraPosition;
+            vec3 diff = positions->at(a) - cameraPosition;
             float distance = diff.length();
 
             // Update the clicked box index if this box is closer to the camera
@@ -198,8 +220,8 @@ bool BoxManager::RemoveBox(Box a)
 
 bool BoxManager::CheckCollision(Box a, Box b)
 {
-    fvec3 distance = (positions->at(a) - positions->at(b)) * 2.0f;
-    fvec3 totalSize = sizes->at(a) + sizes->at(b);
+    vec3 distance = (positions->at(a) - positions->at(b)) * 2.0f;
+    vec3 totalSize = sizes->at(a) + sizes->at(b);
 
     return(
         distance.x < totalSize.x &&
@@ -208,7 +230,7 @@ bool BoxManager::CheckCollision(Box a, Box b)
         );
 }
 
-void BoxManager::ApplyImpulse(const fvec3& impulse)
+void BoxManager::ApplyImpulse(const vec3& impulse)
 {
     for (unsigned int a = 0; a < m_count; a++)
     {
@@ -221,7 +243,7 @@ void BoxManager::ApplyImpulse(const fvec3& impulse)
     }
 }
 
-void BoxManager::ApplyImpulse(const fvec3& impulse, Box a)
+void BoxManager::ApplyImpulse(const vec3& impulse, Box a)
 {
     velocities->at(a) += impulse;
 }
