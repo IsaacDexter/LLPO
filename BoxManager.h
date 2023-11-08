@@ -21,35 +21,35 @@ class BoxManager
 private:
     // this is the number of falling physical items. 
     static const unsigned int maximum = 50;
-    const double gravity = -19.81;
+    const float gravity = -19.81f;
     const float floorY = 0.0f;
     unsigned int m_count = 0;
 
     /// <summary>Coefficient of restitution (0 = inelastic, 1 = elastic)summary>
-    const double e = 0.01;
+    const float e = 0.01f;
     /// <summary>Dampening factor (0.9 = 10% energy reduction)</summary>
-    const double dampening = 0.9;
+    const float dampening = 0.9f;
 
-    std::array<dvec3, maximum>* positions;
-    std::array<dvec3, maximum>* sizes;
-    std::array<dvec3, maximum>* velocities;
-    std::array<dvec3, maximum>* colors;
+    std::array<fvec3, maximum>* positions;
+    std::array<fvec3, maximum>* sizes;
+    std::array<fvec3, maximum>* velocities;
+    std::array<fvec3, maximum>* colors;
     std::array<bool, maximum>* active;
 
 public:
     BoxManager();
 
-    void Update(const double deltaTime);
+    void Update(const float deltaTime);
     // draw the physics objects
     void Draw();
 
 
     void Init(const unsigned int& count);
     // a ray which is used to tap (by default, remove) a box - see the 'mouse' function for how this is used.
-    bool RayBoxIntersection(const dvec3& rayOrigin, const dvec3& rayDirection, Box i);
+    bool RayBoxIntersection(const fvec3& rayOrigin, const fvec3& rayDirection, Box i);
 
     void ResolveCollision(Box a, Box b);
-    Box SelectBox(const dvec3& rayOrigin, const dvec3& rayDirection);
+    Box SelectBox(const fvec3& rayOrigin, const fvec3& rayDirection);
     bool RemoveBox(Box a);
 
     /// <summary>Are these two boxes colliding?</summary>
@@ -58,7 +58,7 @@ public:
     /// <returns>Whether or not the two boxes overlap</returns>
     bool CheckCollision(Box a, Box b);
 
-    void ApplyImpulse(const dvec3& impulse);
-    void ApplyImpulse(const dvec3& impulse, Box a);
+    void ApplyImpulse(const fvec3& impulse);
+    void ApplyImpulse(const fvec3& impulse, Box a);
 };
 
