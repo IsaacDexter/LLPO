@@ -13,6 +13,7 @@
 #include "BoxManager.h"
 
 #include "Camera.h"
+#include "FPSCounter.h"
 
 using namespace std::chrono;
 

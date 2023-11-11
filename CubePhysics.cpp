@@ -106,6 +106,7 @@ void CubePhysics::Idle() {
     float deltaTime = frameTime.count();
 
     m_boxes->Update(deltaTime);
+    FPSCounter::ShowFPS(deltaTime);
 
     // tell glut to draw - note this will cap this function at 60 fps
     glutPostRedisplay();
