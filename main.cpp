@@ -17,6 +17,8 @@
 #include "MemoryManager.h"
 #include <string>
 
+#include "FPSCounter.h"
+
 using namespace std::chrono;
 
 // this is the number of falling physical items. 
@@ -327,6 +329,7 @@ void idle() {
     float deltaTime = frameTime.count();
 
     updatePhysics(deltaTime);
+    FPSCounter::ShowFPS(deltaTime);
 
     // tell glut to draw - note this will cap this function at 60 fps
     glutPostRedisplay();
