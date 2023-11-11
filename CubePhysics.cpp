@@ -144,7 +144,7 @@ void CubePhysics::Keyboard(unsigned char key, int x, int y)
         m_boxes->ApplyImpulse(fvec3(0.0f, 20.0f, 0.0f));
         break;
     }
-    case 'd':
+    case 'm':
     {
         DefaultTracker::OutputStats();
         break;
