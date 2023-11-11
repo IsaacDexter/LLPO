@@ -15,6 +15,7 @@
 #include <ctime>
 #include <chrono>
 #include "MemoryManager.h"
+#include "MemoryTracker.h"
 #include <string>
 
 #include "FPSCounter.h"
@@ -378,10 +379,22 @@ void mouse(int button, int state, int x, int y) {
 void keyboard(unsigned char key, int x, int y) {
     const float impulseMagnitude = 20.0f; // Upward impulse magnitude
 
-    if (key == ' ') { // Spacebar key
+    switch (key)
+    {
+    case ' ':
+    {
         for (Box& box : boxes) {
             box.velocity.y += impulseMagnitude;
         }
+        break;
+    }
+    case 'm':
+    {
+        DefaultTracker::OutputStats();
+        break;
+    }
+    default:
+        break;
     }
 }
 
