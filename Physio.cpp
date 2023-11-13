@@ -41,6 +41,7 @@ bool Physio::Init()
     }
     //Make openGL current context
     glfwMakeContextCurrent(m_window);
+    glfwSwapInterval(0);
     //Set callbacks
     glfwSetKeyCallback(m_window, key_callback);
     glfwSetMouseButtonCallback(m_window, mouse_button_callback);
@@ -125,6 +126,7 @@ void Physio::OnMouseButtonDown(const int button, const double x, const double y)
         rayDirection.normalize();
 
         //selectBox
+        scene->SelectBox(cameraPosition, rayDirection);
     }
 }
 

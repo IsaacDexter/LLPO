@@ -2,9 +2,11 @@
 
 #include "Physio.h"
 
+static Physio application;
+
 int main(int argc, char** argv)
 {
-    Physio application = Physio();
+    application = Physio();
     return 0;
 }
 
