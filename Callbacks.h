@@ -1,8 +1,12 @@
-#ifndef CALLBACKS_H
-#define CALLBACKS_H
+#pragma once
 
-/* Callback function declarations */
-void keyboard(unsigned char key, int x, int y);
-void display(void);
+void error_callback(int error, const char* description)
+{
+    fprintf(stderr, "Error: %s\n", description);
+}
 
-#endif
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+}
