@@ -229,10 +229,35 @@ void Scene::drawBox(const Box& box)
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuseMaterial);
     glScalef(box.size.x(), box.size.y(), box.size.z());
     glRotatef(-90, 1, 0, 0);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    drawCube();
+
     //glutSolidTeapot(1);
     //glutSolidCone(1, 1, 10, 10);
     glPopMatrix();
+}
+
+void Scene::drawCube()
+{
+    GLfloat vertices[] =
+    {
+        -0.5, -0.5, -0.5,   -0.5, -0.5,  0.5,   -0.5,  0.5,  0.5,   -0.5,  0.5, -0.5,
+        0.5, -0.5, -0.5,    0.5, -0.5,  0.5,    0.5,  0.5,  0.5,    0.5,  0.5, -0.5,
+        -0.5, -0.5, -0.5,   -0.5, -0.5,  0.5,    0.5, -0.5,  0.5,    0.5, -0.5, -0.5,
+        -0.5,  0.5, -0.5,   -0.5,  0.5,  0.5,    0.5,  0.5,  0.5,    0.5,  0.5, -0.5,
+        -0.5, -0.5, -0.5,   -0.5,  0.5, -0.5,    0.5,  0.5, -0.5,    0.5, -0.5, -0.5,
+        -0.5, -0.5,  0.5,   -0.5,  0.5,  0.5,    0.5,  0.5,  0.5,    0.5, -0.5,  0.5
+    };
+
+    /* We have a color array and a vertex array */
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, vertices);
+
+    /* Send data : 24 vertices */
+    glDrawArrays(GL_QUADS, 0, 24);
+
+    /* Cleanup states */
+    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void Scene::SelectBox(const Vector3f& camPos, const Vector3f& rayDir)

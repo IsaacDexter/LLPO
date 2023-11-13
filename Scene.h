@@ -19,6 +19,7 @@ public:
 
 	void drawQuad(const Vector3f& v1, const Vector3f& v2, const Vector3f& v3, const Vector3f& v4);
 	void drawBox(const Box& box);
+	void drawCube();
 
 	void SelectBox(const Vector3f& camPos, const Vector3f& rayDir);
 
