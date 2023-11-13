@@ -57,7 +57,7 @@ bool Physio::Init()
     glMatrixMode(GL_PROJECTION);
 
     glLoadIdentity();
-    //gluPerspective(45.0, 800.0 / 600.0, 0.1, 100.0);
+    gluPerspective(45.0, 800.0 / 600.0, 0.1, 100.0);
     glMatrixMode(GL_MODELVIEW);
 
     scene = new Scene();
@@ -95,7 +95,7 @@ void Physio::Draw()
     glLoadIdentity();
 
 
-    //gluLookAt(LOOKAT_X, LOOKAT_Y, LOOKAT_Z, LOOKDIR_X, LOOKDIR_Y, LOOKDIR_Z, 0, 1, 0);
+    gluLookAt(LOOKAT_X, LOOKAT_Y, LOOKAT_Z, LOOKDIR_X, LOOKDIR_Y, LOOKDIR_Z, 0, 1, 0);
 
     scene->Draw();
 

@@ -239,7 +239,7 @@ void Scene::SelectBox(const Vector3f& camPos, const Vector3f& rayDir)
 {
     // Perform a ray-box intersection test and remove the clicked box
     size_t clickedBoxIndex = -1;
-    float minIntersectionDistance = std::numeric_limits<float>::max();
+    float minIntersectionDistance = FLT_MAX;
 
     for (size_t i = 0; i < boxes.size(); ++i) {
         if (rayBoxIntersection(camPos, rayDir, boxes[i])) {

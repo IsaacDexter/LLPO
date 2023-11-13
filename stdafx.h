@@ -8,8 +8,13 @@
 #include <ctime>
 #include <chrono>
 #include <string>
+#include <limits>
 
 #include <Dense>
+
+#include <Windows.h>
+#include <gl/GL.h>
+#include <gl/GLU.h>
 #include <GLFW/glfw3.h>
 
 #include "MemoryManager.h"
