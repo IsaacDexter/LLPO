@@ -3,18 +3,14 @@
 #include "stdafx.h"
 #include "Scene.h"
 
-double g_last = 0.0f;
-GLFWwindow* g_window = nullptr;
-
 using namespace std::chrono;
-
-
-// this is the number of falling physical items. 
 
 class Physio
 {
 private:
 	Scene* scene;
+	GLFWwindow* m_window = nullptr;
+	double m_last = 0.0f;
 public:
 	Physio();
 	~Physio();

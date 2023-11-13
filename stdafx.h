@@ -9,9 +9,8 @@
 #include <chrono>
 #include <string>
 
-#include "eigen/Eigen/Dense"
+#include <Dense>
 #include <GLFW/glfw3.h>
-//#include <gl/GLU.h>
 
 #include "MemoryManager.h"
 #include "MemoryTracker.h"

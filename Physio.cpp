@@ -32,22 +32,22 @@ bool Physio::Init()
         error_callback(1, "GLFW initialization failed.\n");
     }
     //Create window, returning handle to created window and context object
-    g_window = glfwCreateWindow(WINDOW_X, WINDOW_Y, WINDOW_TITLE, NULL, NULL);
-    if (!g_window)
+    m_window = glfwCreateWindow(WINDOW_X, WINDOW_Y, WINDOW_TITLE, NULL, NULL);
+    if (!m_window)
     {
         //Window or OpenGL context creation failed
         success = false;
         error_callback(2, "Window or OpenGL context creation failed.\n");
     }
     //Make openGL current context
-    glfwMakeContextCurrent(g_window);
+    glfwMakeContextCurrent(m_window);
     //Set callbacks
-    glfwSetKeyCallback(g_window, key_callback);
-    glfwSetMouseButtonCallback(g_window, mouse_button_callback);
+    glfwSetKeyCallback(m_window, key_callback);
+    glfwSetMouseButtonCallback(m_window, mouse_button_callback);
 
     //retrieve framebuffer size for glViewport
     int width, height;
-    glfwGetFramebufferSize(g_window, &width, &height);
+    glfwGetFramebufferSize(m_window, &width, &height);
     glViewport(0, 0, width, height);
 
     //GL settings
@@ -69,13 +69,13 @@ bool Physio::Init()
 void Physio::MainLoop()
 {
     //Until the window needs to close
-    while (!glfwWindowShouldClose(g_window))
+    while (!glfwWindowShouldClose(m_window))
     {
         double time = glfwGetTime();
-        double deltaTime = time - g_last;
-        g_last = time;
+        double deltaTime = time - m_last;
+        m_last = time;
 
-        FPSCounter::ShowFPS(deltaTime);
+        FPSCounter::ShowFPS(deltaTime, m_window);
 
         Update(deltaTime);
         Draw();
@@ -99,12 +99,12 @@ void Physio::Draw()
 
     scene->Draw();
 
-    glfwSwapBuffers(g_window);
+    glfwSwapBuffers(m_window);
 }
 
 void Physio::Close()
 {
-    glfwDestroyWindow(g_window);
+    glfwDestroyWindow(m_window);
     glfwTerminate();
     exit(EXIT_SUCCESS);
 }

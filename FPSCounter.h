@@ -25,7 +25,7 @@ class FPSCounter_template
 protected:
     static FPSData m_data;
 public:
-    inline static void ShowFPS(const float deltaTime)
+    inline static void ShowFPS(const float deltaTime, GLFWwindow* window)
     {
         m_data.elapsedTime += deltaTime;
         //If the difference is greater than the interval
@@ -34,7 +34,7 @@ public:
         {
             //Output FPS and reset the timer
             sprintf_s(m_data.buffer, "FPS = %f\n", m_data.frames / m_data.elapsedTime);
-            glutSetWindowTitle(m_data.buffer);
+            glfwSetWindowTitle(window, m_data.buffer);
             m_data.elapsedTime = 0.0f;
             m_data.frames = 0;
         }

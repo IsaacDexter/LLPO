@@ -121,7 +121,7 @@ Vector3f Scene::ScreenToWorld(const double x, const double y)
     GLdouble modelview[16];
     GLdouble projection[16];
     GLfloat winX, winY, winZ;
-    GLdouble posX, posY, posZ;
+    GLdouble posX = 0.0f, posY = 0.0f, posZ = 0.0f;
 
     glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
     glGetDoublev(GL_PROJECTION_MATRIX, projection);

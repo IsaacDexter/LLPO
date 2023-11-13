@@ -4,7 +4,7 @@
 
 int main(int argc, char** argv)
 {
-    Physio();
+    Physio application = Physio();
     return 0;
 }
 
