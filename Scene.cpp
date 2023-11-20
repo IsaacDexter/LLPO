@@ -131,7 +131,7 @@ Vector3f Scene::ScreenToWorld(const double x, const double y)
     winY = (float)viewport[3] - (float)y;
     glReadPixels(x, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
 
-    //gluUnProject(winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
+    gluUnProject(winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
 
 
     Vector3f(posX, posY, posZ);
