@@ -1,12 +1,10 @@
+#pragma once
 #include "stdafx.h"
-
 #include "Physio.h"
-
-static Physio application;
 
 int main(int argc, char** argv)
 {
-    application = Physio();
+    Physio::Start();
     return 0;
 }
 

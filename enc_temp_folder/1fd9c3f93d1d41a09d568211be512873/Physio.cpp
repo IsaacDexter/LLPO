@@ -146,9 +146,7 @@ void Physio::OnKeyDown(int key)
     }
     case GLFW_KEY_M:
     {
-#if defined(_DEBUG)
         DefaultTracker::OutputStats();
-#endif
         break;
     }
     default:

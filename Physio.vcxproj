@@ -182,10 +182,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Box.h" />
-    <ClInclude Include="Callbacks.h" />
+    <ClInclude Include="callbacks.h" />
     <ClInclude Include="constants.h" />
     <ClInclude Include="FPSCounter.h" />
-    <ClInclude Include="main.h" />
     <ClInclude Include="MemoryManager.h" />
     <ClInclude Include="MemoryTracker.h" />
     <ClInclude Include="Physio.h" />
