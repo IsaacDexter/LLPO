@@ -84,12 +84,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDIr)glfwWIN32\include;$(SolutionDir)eigen\Eigen</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>glut\include;$(SolutionDIr)glfwWIN32\include;$(SolutionDir)eigen\Eigen</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);opengl32.lib;glu32.lib;$(SolutionDir)glfwWIN32\lib-vc2022\glfw3.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);opengl32.lib;glu32.lib;$(SolutionDir)glfwWIN32\lib-vc2022\glfw3.lib;$(SolutionDir)glut\lib\freeglut.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
     </Link>
@@ -108,14 +108,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDIr)glfwWIN32\include;$(SolutionDir)eigen\Eigen</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>glut\include;$(SolutionDIr)glfwWIN32\include;$(SolutionDir)eigen\Eigen</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);opengl32.lib;glu32.lib;$(SolutionDir)glfwWIN32\lib-vc2022\glfw3.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);opengl32.lib;glu32.lib;$(SolutionDir)glfwWIN32\lib-vc2022\glfw3.lib;$(SolutionDir)glut\lib\freeglut.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
     </Link>
@@ -132,14 +132,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDIr)glfwx64\include;$(SolutionDir)eigen\Eigen</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>glut\include;$(SolutionDIr)glfwx64\include;$(SolutionDir)eigen\Eigen</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);opengl32.lib;glu32.lib;$(SolutionDir)glfwx64\lib-vc2022\glfw3.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);opengl32.lib;glu32.lib;$(SolutionDir)glfwx64\lib-vc2022\glfw3.lib;$(SolutionDir)glut\lib\x64\freeglut.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -156,14 +156,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDIr)glfwx64\include;$(SolutionDir)eigen\Eigen</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>glut\include;$(SolutionDIr)glfwx64\include;$(SolutionDir)eigen\Eigen</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);opengl32.lib;glu32.lib;$(SolutionDir)glfwx64\lib-vc2022\glfw3.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);opengl32.lib;glu32.lib;$(SolutionDir)glfwx64\lib-vc2022\glfw3.lib;$(SolutionDir)glut\lib\x64\freeglut.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
     </Link>

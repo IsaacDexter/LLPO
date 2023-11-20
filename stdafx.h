@@ -16,6 +16,7 @@
 #include <gl/GL.h>
 #include <gl/GLU.h>
 #include <GLFW/glfw3.h>
+#include <GL/freeglut.h>
 
 #include "Box.h"
 #include "constants.h"
