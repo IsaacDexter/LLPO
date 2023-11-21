@@ -3,56 +3,28 @@
 #include "callbacks.h"
 
 static Scene* g_scene = nullptr;
-static GLFWwindow* g_window = nullptr;
-static double g_last = 0.0f;
+static steady_clock::time_point g_last;
 
-
-void Physio::Start()
-{
-    g_scene = nullptr;
-
-    bool success;
-    success = Init();
-    if (!success)
-    {
-        exit(EXIT_FAILURE);
-    }
-
-    MainLoop();
-
-    Close();
-}
-
-bool Physio::Init()
+void Physio::Init(int argc, char** argv)
 {
     srand(static_cast<unsigned>(time(0))); // Seed random number generator
-    //Initialise GLFW
-    bool success = true;
-    if (!glfwInit())
-    {
-        //Initialization failed
-        success = false;
-        error_callback(1, "GLFW initialization failed.\n");
-    }
-    //Create window, returning handle to created window and context object
-    g_window = glfwCreateWindow(WINDOW_X, WINDOW_Y, WINDOW_TITLE, NULL, NULL);
-    if (!g_window)
-    {
-        //Window or OpenGL context creation failed
-        success = false;
-        error_callback(2, "Window or OpenGL context creation failed.\n");
-    }
-    //Make openGL current context
-    glfwMakeContextCurrent(g_window);
-    glfwSwapInterval(0);
-    //Set callbacks
-    glfwSetKeyCallback(g_window, key_callback);
-    glfwSetMouseButtonCallback(g_window, mouse_button_callback);
+    g_last = steady_clock::now();   //store initial time for deltaTime;
 
-    //retrieve framebuffer size for glViewport
-    int width, height;
-    glfwGetFramebufferSize(g_window, &width, &height);
-    glViewport(0, 0, width, height);
+    //Initialise GLUT
+    bool success = true; 
+    glutInit(&argc, argv);
+    //init display with bit mask double buffering, RGBA mode window, and a depth buffer
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    
+    //Create window
+    glutInitWindowSize(WINDOW_X, WINDOW_Y);
+    glutCreateWindow(WINDOW_TITLE);
+
+    //Set callbacks
+    glutKeyboardFunc(key_callback);
+    glutMouseFunc(mouse_button_callback);
+    glutDisplayFunc(Draw);
+    glutIdleFunc(Idle);
 
     //GL settings
     glEnable(GL_DEPTH_TEST);
@@ -67,25 +39,21 @@ bool Physio::Init()
     g_scene = new Scene();
     g_scene->Init(NUMBER_OF_BOXES);
 
-    return success;
+    glutMainLoop();
 }
 
-void Physio::MainLoop()
+void Physio::Idle()
 {
-    //Until the window needs to close
-    while (!glfwWindowShouldClose(g_window))
-    {
-        double time = glfwGetTime();
-        double deltaTime = time - g_last;
-        g_last = time;
+    auto now = steady_clock::now();
+    const duration<float> frameTime = now - g_last;
+    const float deltaTime = frameTime.count();
+    g_last = steady_clock::now();
 
-        FPSCounter::ShowFPS(deltaTime, g_window);
+    FPSCounter::ShowFPS(deltaTime);
 
-        Update(deltaTime);
-        Draw();
-        //Poll input
-        glfwPollEvents();
-    }
+    Update(deltaTime);
+
+    glutPostRedisplay();
 }
 
 void Physio::Update(const float deltaTime)
@@ -98,24 +66,23 @@ void Physio::Draw()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-
     gluLookAt(LOOKAT_X, LOOKAT_Y, LOOKAT_Z, LOOKDIR_X, LOOKDIR_Y, LOOKDIR_Z, 0, 1, 0);
 
     g_scene->Draw();
 
-    glfwSwapBuffers(g_window);
+    glutSwapBuffers();
 }
 
 void Physio::Close()
 {
-    glfwDestroyWindow(g_window);
-    glfwTerminate();
+    glutDestroyWindow(glutGetWindow());
+    glutLeaveMainLoop();
     exit(EXIT_SUCCESS);
 }
 
-void Physio::OnMouseButtonDown(const int button, const double x, const double y)
+void Physio::OnMouseButtonDown(const int button, const int x, const int y)
 {
-    if (button == GLFW_MOUSE_BUTTON_1)
+    if (button == GLUT_LEFT_BUTTON)
     {
         // Get the camera position and direction
         Vector3f cameraPosition(LOOKAT_X, LOOKAT_Y, LOOKAT_Z); // Replace with your actual camera position
@@ -133,20 +100,25 @@ void Physio::OnMouseButtonDown(const int button, const double x, const double y)
     }
 }
 
-void Physio::OnKeyDown(int key)
+void Physio::OnKeyDown(const int key)
 {
     const Vector3f impulse = Vector3f(0.0f, 20.0f, 0.0f);
 
     switch (key)
     {
-    case GLFW_KEY_SPACE:
+    case ' ':
     {
         g_scene->ApplyImpulse(impulse);
         break;
     }
-    case GLFW_KEY_M:
+    case 'm':
     {
         DefaultTracker::OutputStats();
+        break;
+    }
+    case GLUT_KEY_ESCAPE:    //Escape to exit the game
+    {
+        Close();
         break;
     }
     default:

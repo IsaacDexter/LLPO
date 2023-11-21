@@ -4,7 +4,7 @@
 
 int main(int argc, char** argv)
 {
-    Physio::Start();
+    Physio::Init(argc, argv);
     return 0;
 }
 

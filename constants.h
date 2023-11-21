@@ -11,6 +11,7 @@
 #define WINDOW_Y 1080
 #define WINDOW_TITLE "Simple Physics Simulation"
 
+#define GLUT_KEY_ESCAPE 27
 
 // these is where the camera is, where it is looking and the bounds of the continaing box. You shouldn't need to alter these
 

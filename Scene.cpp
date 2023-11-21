@@ -230,8 +230,9 @@ void Scene::drawBox(const Box& box)
     glScalef(box.size.x(), box.size.y(), box.size.z());
     glRotatef(-90, 1, 0, 0);
 
-    drawCube();
-
+    //drawCube();
+    
+    glutSolidCube(1);
     //glutSolidTeapot(1);
     //glutSolidCone(1, 1, 10, 10);
     glPopMatrix();
