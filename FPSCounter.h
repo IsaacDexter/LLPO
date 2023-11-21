@@ -3,7 +3,7 @@
 struct FPSData
 {
     //Used to output FPS
-    char buffer[64];
+    char buffer[64] = "";
     float elapsedTime;
     //How frequently to update the counter
     float interval;
@@ -37,6 +37,15 @@ public:
             glutSetWindowTitle(m_data.buffer);
             m_data.elapsedTime = 0.0f;
             m_data.frames = 0;
+        }
+    }
+
+    inline static void LogFPS()
+    { 
+        //Calculate the fps over the current interval. This could technically be 0 but its just a debug tool, just press the key again. I've stopped it from crashing at least.
+        if (m_data.elapsedTime > 0.0f && m_data.frames > 0)
+        {
+            printf("FPS = %f\n", m_data.frames / m_data.elapsedTime);
         }
     }
 
