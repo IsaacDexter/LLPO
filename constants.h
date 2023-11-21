@@ -5,7 +5,7 @@
 #define minZ -30.0f
 #define maxZ 30.0f
 
-#define NUMBER_OF_BOXES 50
+#define NUMBER_OF_BOXES 5000
 
 #define WINDOW_X 1920
 #define WINDOW_Y 1080

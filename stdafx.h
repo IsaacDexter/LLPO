@@ -25,5 +25,4 @@
 #include "MemoryTracker.h"
 #include "FPSCounter.h"
 
-
 using Eigen::Vector3f;

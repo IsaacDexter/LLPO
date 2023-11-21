@@ -116,6 +116,16 @@ void Physio::OnKeyDown(const int key)
         DefaultTracker::OutputStats();
         break;
     }
+    case 'f':
+    {
+        FPSCounter::LogFPS();
+        break;
+    }
+    case 'c':
+    {
+        printf_s("Boxes = %i\n", NUMBER_OF_BOXES);
+        break;
+    }
     case GLUT_KEY_ESCAPE:    //Escape to exit the game
     {
         Close();

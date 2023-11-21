@@ -25,24 +25,6 @@ class FPSCounter_template
 protected:
     static FPSData m_data;
 public:
-    /// <summary>GLFW fps function</summary>
-    /// <param name="deltaTime">pass from update function</param>
-    /// <param name="window">handle to glfwwindow and context</param>
-    //inline static void ShowFPS(const float deltaTime, GLFWwindow* window)
-    //{
-    //    m_data.elapsedTime += deltaTime;
-    //    //If the difference is greater than the interval
-    //    m_data.frames++;
-    //    if (m_data.elapsedTime >= m_data.interval)
-    //    {
-    //        //Output FPS and reset the timer
-    //        sprintf_s(m_data.buffer, "FPS = %f\n", m_data.frames / m_data.elapsedTime);
-    //        glfwSetWindowTitle(window, m_data.buffer);
-    //        m_data.elapsedTime = 0.0f;
-    //        m_data.frames = 0;
-    //    }
-    //}
-
     inline static void ShowFPS(const float deltaTime)
     {
         m_data.elapsedTime += deltaTime;
@@ -55,6 +37,15 @@ public:
             glutSetWindowTitle(m_data.buffer);
             m_data.elapsedTime = 0.0f;
             m_data.frames = 0;
+        }
+    }
+
+    inline static void LogFPS()
+    { 
+        //Calculate the fps over the current interval. This could technically be 0 but its just a debug tool, just press the key again. I've stopped it from crashing at least.
+        if (m_data.elapsedTime > 0.0f && m_data.frames > 0)
+        {
+            printf("FPS = %f\n", m_data.frames / m_data.elapsedTime);
         }
     }
 
