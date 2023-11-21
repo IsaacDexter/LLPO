@@ -159,6 +159,16 @@ void CubePhysics::Keyboard(unsigned char key, int x, int y)
         m_boxes->Update(1.0f / 60.0f);
         break;
     }
+    case 'f':
+    {
+        FPSCounter::LogFPS();
+        break;
+    }
+    case 'c':
+    {
+        printf_s("Boxes = %i\n", NUMBER_OF_BOXES);
+        break;
+    }
     default:
     {
         break;

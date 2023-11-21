@@ -3,13 +3,11 @@
 #include <array>
 #include <glm.hpp>
 #include <GL/glut.h>
+#include "constants.h"
 
 using namespace glm;
 
 typedef const unsigned int& Box;
-
-
-#define BOX_COUNT 50
 
 #define minX -10.0f
 #define maxX 30.0f
@@ -20,10 +18,10 @@ class BoxManager
 {
 private:
     // this is the number of falling physical items. 
-    static const unsigned int maximum = 50;
+    static const unsigned int maximum = NUMBER_OF_BOXES;
     const float gravity = -19.81f;
     const float floorY = 0.0f;
-    unsigned int m_count = 0;
+    unsigned int m_count = NUMBER_OF_BOXES;
 
     /// <summary>Coefficient of restitution (0 = inelastic, 1 = elastic)summary>
     const float e = 0.01f;

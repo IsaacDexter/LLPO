@@ -14,6 +14,7 @@
 
 #include "Camera.h"
 #include "FPSCounter.h"
+#include "constants.h"
 
 using namespace std::chrono;
 
@@ -49,6 +50,6 @@ private:
 	void DrawScene();
 private:
 	BoxManager* m_boxes;
-	const unsigned int& m_boxCount = 50;
+	const unsigned int& m_boxCount = NUMBER_OF_BOXES;
 };
 

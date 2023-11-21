@@ -183,6 +183,7 @@
     <ClInclude Include="BoxManager.h" />
     <ClInclude Include="Callbacks.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="constants.h" />
     <ClInclude Include="CubePhysics.h" />
     <ClInclude Include="FPSCounter.h" />
     <ClInclude Include="MemoryManager.h" />
