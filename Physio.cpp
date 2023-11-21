@@ -146,9 +146,17 @@ void Physio::OnKeyDown(int key)
     }
     case GLFW_KEY_M:
     {
-#if defined(_DEBUG)
         DefaultTracker::OutputStats();
-#endif
+        break;
+    }
+    case GLFW_KEY_F:
+    {
+        FPSCounter::LogFPS();
+        break;
+    }
+    case GLFW_KEY_C:
+    {
+        printf_s("Boxes = %i\n", NUMBER_OF_BOXES);
         break;
     }
     default:

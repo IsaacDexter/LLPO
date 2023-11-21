@@ -20,12 +20,8 @@
 #include "Box.h"
 #include "constants.h"
 
-#if defined(_DEBUG)
-
 #include "MemoryManager.h"
 #include "MemoryTracker.h"
 #include "FPSCounter.h"
-
-#endif
 
 using Eigen::Vector3f;

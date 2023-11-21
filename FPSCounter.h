@@ -40,6 +40,15 @@ public:
         }
     }
 
+    inline static void LogFPS()
+    {
+        //Calculate the fps over the current interval. This could technically be 0 but its just a debug tool, just press the key again. I've stopped it from crashing at least.
+        if (m_data.elapsedTime > 0.0f && m_data.frames > 0)
+        {
+            printf("FPS = %f\n", m_data.frames / m_data.elapsedTime);
+        }
+    }
+
     //Prevent instanciation
     FPSCounter_template() = delete;
 };
