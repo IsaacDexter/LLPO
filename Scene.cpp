@@ -1,29 +1,37 @@
 #include "Scene.h"
 
-void Scene::Init(const int boxCount)
+Scene::Scene()
 {
-    for (int i = 0; i < boxCount; ++i) {
-        Box box;
-        Vector3f vect;
-        vect[0];
+    boxes = new BoxArray();
+}
 
-        // Assign random x, y, and z positions within specified ranges
-        box.position.x() = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
-        box.position.y() = 10.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 1.0f));
-        box.position.z() = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
+Scene::~Scene()
+{
+}
 
-        box.size = { 1.0f, 1.0f, 1.0f };
+void Scene::Init()
+{
+    for (auto &box: *boxes) 
+    {
+        ////Initialize a new box
+        //box = Box();
 
-        // Assign random x-velocity between -1.0f and 1.0f
-        float randomXVelocity = -1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 2.0f));
-        box.velocity = { randomXVelocity, 0.0f, 0.0f };
+        //// Assign random x, y, and z positions within specified ranges
+        //box.position.x() = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
+        //box.position.y() = 10.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 1.0f));
+        //box.position.z() = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
 
-        // Assign a random color to the box
-        box.colour.x() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-        box.colour.y() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-        box.colour.z() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        //// Assign random x-velocity between -1.0f and 1.0f
+        //box.velocity.x() = -1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 2.0f));;
 
-        boxes.push_back(box);
+        //// Assign a random color to the box
+        //box.colour.x() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        //box.colour.y() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        //box.colour.z() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+    }
+    for (unsigned int i = 0; i < boxes->size(); i++)
+    {
+        boxes->at(i) = i;
     }
 }
 
@@ -58,62 +66,92 @@ void Scene::Draw()
     Vector3f backWallV4(maxX, 0.0f, minZ);
     drawQuad(backWallV1, backWallV2, backWallV3, backWallV4);
 
-    for (const Box& box : boxes) {
-        drawBox(box);
+    for (const auto& box : *boxes) {
+        //drawBox(box);
     }
 }
 
 void Scene::Update(const double deltaTime)
 {
-    const float floorY = 0.0f;
+    DistributeUpdate(deltaTime, 4);
+    //const float floorY = 0.0f;
 
-    //char buffer[100];
-    //sprintf_s(buffer, "DeltaTime = %f\n", deltaTime);
-    //OutputDebugStringA(buffer);
+    ////char buffer[100];
+    ////sprintf_s(buffer, "DeltaTime = %f\n", deltaTime);
+    ////OutputDebugStringA(buffer);
 
-    for (Box& box : boxes) {
-        // Update velocity due to gravity
-        box.velocity.y() += gravity * deltaTime;
+    //for (Box& box : *boxes) {
+    //    // Update velocity due to gravity
+    //    box.velocity.y() += gravity * deltaTime;
 
-        // Update position based on velocity
-        box.position.x() += box.velocity.x() * deltaTime;
-        box.position.y() += box.velocity.y() * deltaTime;
-        box.position.z() += box.velocity.z() * deltaTime;
+    //    // Update position based on velocity
+    //    box.position.x() += box.velocity.x() * deltaTime;
+    //    box.position.y() += box.velocity.y() * deltaTime;
+    //    box.position.z() += box.velocity.z() * deltaTime;
 
-        // Check for collision with the floor
-        if (box.position.y() - box.size.y() / 2.0f < floorY) {
-            box.position.y() = floorY + box.size.y() / 2.0f;
-            float dampening = 0.7f;
-            box.velocity.y() = -box.velocity.y() * dampening;
-        }
+    //    // Check for collision with the floor
+    //    if (box.position.y() - box.size.y() / 2.0f < floorY) {
+    //        box.position.y() = floorY + box.size.y() / 2.0f;
+    //        float dampening = 0.7f;
+    //        box.velocity.y() = -box.velocity.y() * dampening;
+    //    }
 
-        // Check for collision with the walls
-        if (box.position.x() - box.size.x() / 2.0f < minX || box.position.x() + box.size.x() / 2.0f > maxX) {
-            box.velocity.x() = -box.velocity.x();
-        }
-        if (box.position.z() - box.size.z() / 2.0f < minZ || box.position.z() + box.size.z() / 2.0f > maxZ) {
-            box.velocity.z() = -box.velocity.z();
-        }
+    //    // Check for collision with the walls
+    //    if (box.position.x() - box.size.x() / 2.0f < minX || box.position.x() + box.size.x() / 2.0f > maxX) {
+    //        box.velocity.x() = -box.velocity.x();
+    //    }
+    //    if (box.position.z() - box.size.z() / 2.0f < minZ || box.position.z() + box.size.z() / 2.0f > maxZ) {
+    //        box.velocity.z() = -box.velocity.z();
+    //    }
 
-        // Check for collisions with other boxes
-        for (Box& other : boxes) {
-            if (&box == &other) continue;
-            if (checkCollision(box, other)) {
-                resolveCollision(box, other);
-                break;
-            }
-        }
+    //    // Check for collisions with other boxes
+    //    for (Box& other : *boxes) {
+    //        if (&box == &other) continue;
+    //        if (checkCollision(box, other)) {
+    //            resolveCollision(box, other);
+    //            break;
+    //        }
+    //    }
+    //}
+}
+
+void Scene::DistributeUpdate(const double deltaTime, const unsigned int threadCount)
+{
+    //early out with empty box array/no threads to prevent throws from -1 or /0 errors
+    if (boxes->size() == 0 || threadCount == 0)
+    {
+        return;
+    }
+
+    //Calculate how much of the cubes each thread will iterate through
+    const int totalSize = boxes->size() - 1;
+    const unsigned int sectionSize = totalSize / threadCount;
+    //Caclulate how much additional load the first thread will have to carry
+    unsigned int remainder = totalSize - sectionSize * threadCount;
+
+    auto start = boxes->begin();
+    auto end = start;
+
+    //Assign the first thread
+    for (unsigned int i = 0; i < threadCount; i++)
+    {
+        //Calculate at which iterator to end this thread
+        end += sectionSize + remainder;
+        //Spin up the thread, including the remainder
+        std::thread(&Scene::UpdateSection, this, deltaTime, start, end).join();
+        start = end;
+        //Set the remainder to 0, to prevent anything but the first thread from using it
+        remainder = 0;
     }
 }
 
-Scene::Scene()
+void Scene::UpdateSection(const double deltaTime, BoxArray::iterator start, BoxArray::iterator end)
 {
-    boxes = std::vector<Box>();
+    char buffer[100];
+    sprintf_s(buffer, "Updating section from %i to %i\n", *start, *end);
+    OutputDebugStringA(buffer);
 }
 
-Scene::~Scene()
-{
-}
 
 Vector3f Scene::ScreenToWorld(const double x, const double y)
 {
@@ -264,32 +302,33 @@ void Scene::drawCube()
 void Scene::SelectBox(const Vector3f& camPos, const Vector3f& rayDir)
 {
     // Perform a ray-box intersection test and remove the clicked box
-    size_t clickedBoxIndex = -1;
     float minIntersectionDistance = FLT_MAX;
 
-    for (size_t i = 0; i < boxes.size(); ++i) {
-        if (rayBoxIntersection(camPos, rayDir, boxes[i])) {
-            // Calculate the distance between the camera and the intersected box
-            Vector3f diff = boxes[i].position - camPos;
-            float distance = diff.norm();
+    Box* selection = nullptr;
 
-            // Update the clicked box index if this box is closer to the camera
-            if (distance < minIntersectionDistance) {
-                clickedBoxIndex = i;
-                minIntersectionDistance = distance;
-            }
-        }
+    for (auto& box : *boxes) {
+        //if (rayBoxIntersection(camPos, rayDir, box)) {
+        //    // Calculate the distance between the camera and the intersected box
+        //    Vector3f diff = box.position - camPos;
+        //    float distance = diff.norm();
+
+        //    // Update the clicked box if this box is closer to the camera
+        //    if (distance < minIntersectionDistance) {
+        //        selection = &box;
+        //        minIntersectionDistance = distance;
+        //    }
+        //}
     }
 
     // Remove the clicked box if any
-    if (clickedBoxIndex != -1) {
-        boxes.erase(boxes.begin() + clickedBoxIndex);
+    if (selection != nullptr) {
+        selection->active = false;
     }
 }
 
 void Scene::ApplyImpulse(const Vector3f& impulse)
 {
-    for (Box& box : boxes) {
-        box.velocity += impulse;
+    for (auto& box : *boxes) {
+        //box.velocity += impulse;
     }
 }

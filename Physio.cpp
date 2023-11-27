@@ -37,7 +37,7 @@ void Physio::Init(int argc, char** argv)
     glMatrixMode(GL_MODELVIEW);
 
     g_scene = new Scene();
-    g_scene->Init(NUMBER_OF_BOXES);
+    g_scene->Init();
 
     glutMainLoop();
 }

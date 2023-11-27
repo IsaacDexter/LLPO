@@ -1,13 +1,17 @@
 #pragma once
 
 #include "stdafx.h"
+#include <thread>
+#include <algorithm>
+
+typedef std::array<int, NUMBER_OF_BOXES> BoxArray;
 
 class Scene
 {
 private:
 	// gravity - change it and see what happens (usually negative!)
 	const float gravity = -19.81f;
-	std::vector<Box> boxes;
+	BoxArray* boxes;
 public:
 	Scene();
 	~Scene();
@@ -25,8 +29,11 @@ public:
 
 	void ApplyImpulse(const Vector3f& impulse);
 
-	void Init(const int boxCount);
+	void Init();
 	void Draw();
 	void Update(const double deltaTime);
+
+	void DistributeUpdate(const double deltaTime, const unsigned int threadCount);
+	void UpdateSection(const double deltaTime, BoxArray::iterator start, BoxArray::iterator end);
 };
 
