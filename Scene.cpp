@@ -3,6 +3,7 @@
 Scene::Scene()
 {
     boxes = new BoxArray();
+    threads = new ThreadArray();
 }
 
 Scene::~Scene()
@@ -13,26 +14,25 @@ void Scene::Init()
 {
     for (auto &box: *boxes) 
     {
-        ////Initialize a new box
-        //box = Box();
+        //Initialize a new box
+        box = Box();
 
-        //// Assign random x, y, and z positions within specified ranges
-        //box.position.x() = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
-        //box.position.y() = 10.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 1.0f));
-        //box.position.z() = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
+        // Assign random x, y, and z positions within specified ranges
+        box.position.x() = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
+        box.position.y() = 10.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 1.0f));
+        box.position.z() = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
 
-        //// Assign random x-velocity between -1.0f and 1.0f
-        //box.velocity.x() = -1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 2.0f));;
+        // Assign random x-velocity between -1.0f and 1.0f
+        box.velocity.x() = -1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 2.0f));;
 
-        //// Assign a random color to the box
-        //box.colour.x() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-        //box.colour.y() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-        //box.colour.z() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        // Assign a random color to the box
+        box.colour.x() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        box.colour.y() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        box.colour.z() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
     }
-    for (unsigned int i = 0; i < boxes->size(); i++)
-    {
-        boxes->at(i) = i;
-    }
+
+    //Spin up update threads
+    DistributeUpdate();
 }
 
 void Scene::Draw()
@@ -67,13 +67,32 @@ void Scene::Draw()
     drawQuad(backWallV1, backWallV2, backWallV3, backWallV4);
 
     for (const auto& box : *boxes) {
-        //drawBox(box);
+        if (!box.active)
+        {
+            continue;
+        }
+        drawBox(box);
     }
 }
 
 void Scene::Update(const double deltaTime)
 {
-    DistributeUpdate(deltaTime, 4);
+    for (auto& thread : *threads)
+    {
+        thread.UpdateThread(deltaTime);
+    }
+
+    //// Check for collisions between each box other boxes
+    //for (Box& box : *boxes) {
+    //    for (Box& other : *boxes) {
+    //        if (&box == &other) continue;
+    //        if (checkCollision(box, other)) {
+    //            resolveCollision(box, other);
+    //            break;
+    //        }
+    //    }
+    //}
+
     //const float floorY = 0.0f;
 
     ////char buffer[100];
@@ -115,42 +134,81 @@ void Scene::Update(const double deltaTime)
     //}
 }
 
-void Scene::DistributeUpdate(const double deltaTime, const unsigned int threadCount)
+void Scene::DistributeUpdate()
 {
     //early out with empty box array/no threads to prevent throws from -1 or /0 errors
-    if (boxes->size() == 0 || threadCount == 0)
+    if (boxes->size() == 0 || threads->size() == 0)
     {
         return;
     }
 
     //Calculate how much of the cubes each thread will iterate through
-    const int totalSize = boxes->size() - 1;
-    const unsigned int sectionSize = totalSize / threadCount;
+    const int totalSize = boxes->size();
+    const unsigned int sectionSize = totalSize / threads->size();
     //Caclulate how much additional load the first thread will have to carry
-    unsigned int remainder = totalSize - sectionSize * threadCount;
+    unsigned int remainder = totalSize - sectionSize * threads->size();
 
-    auto start = boxes->begin();
-    auto end = start;
+    auto end = boxes->begin();
 
     //Assign the first thread
-    for (unsigned int i = 0; i < threadCount; i++)
+    for (auto& thread : *threads)
     {
+        auto start = end;
         //Calculate at which iterator to end this thread
         end += sectionSize + remainder;
         //Spin up the thread, including the remainder
-        std::thread(&Scene::UpdateSection, this, deltaTime, start, end).join();
-        start = end;
+        thread.CreateThread(start, end);
         //Set the remainder to 0, to prevent anything but the first thread from using it
         remainder = 0;
     }
 }
 
-void Scene::UpdateSection(const double deltaTime, BoxArray::iterator start, BoxArray::iterator end)
-{
-    char buffer[100];
-    sprintf_s(buffer, "Updating section from %i to %i\n", *start, *end);
-    OutputDebugStringA(buffer);
-}
+//void Scene::UpdateSection(const double deltaTime, BoxArray::iterator box, BoxArray::iterator end)
+//{
+//    const float floorY = 0.0f;
+//
+//    //char buffer[100];
+//    //sprintf_s(buffer, "DeltaTime = %f\n", deltaTime);
+//    //OutputDebugStringA(buffer);
+//
+//    for (;box != end; box++)
+//    {
+//        if (!box->active)
+//        {
+//            continue;
+//        }
+//        box->velocity.y() += GRAVITY * deltaTime;
+//
+//        // Update position based on velocity
+//        box->position.x() += box->velocity.x() * deltaTime;
+//        box->position.y() += box->velocity.y() * deltaTime;
+//        box->position.z() += box->velocity.z() * deltaTime;
+//
+//        // Check for collision with the floor
+//        if (box->position.y() - box->size.y() / 2.0f < floorY) {
+//            box->position.y() = floorY + box->size.y() / 2.0f;
+//            float dampening = 0.7f;
+//            box->velocity.y() = -box->velocity.y() * dampening;
+//        }
+//
+//        // Check for collision with the walls
+//        if (box->position.x() - box->size.x() / 2.0f < minX || box->position.x() + box->size.x() / 2.0f > maxX) {
+//            box->velocity.x() = -box->velocity.x();
+//        }
+//        if (box->position.z() - box->size.z() / 2.0f < minZ || box->position.z() + box->size.z() / 2.0f > maxZ) {
+//            box->velocity.z() = -box->velocity.z();
+//        }
+//
+//        // Check for collisions with other boxes
+//        for (Box& other : *boxes) {
+//            if (&*box == &other) continue;
+//            if (checkCollision(*box, other)) {
+//                resolveCollision(*box, other);
+//                break;
+//            }
+//        }
+//    }
+//}
 
 
 Vector3f Scene::ScreenToWorld(const double x, const double y)
@@ -307,17 +365,17 @@ void Scene::SelectBox(const Vector3f& camPos, const Vector3f& rayDir)
     Box* selection = nullptr;
 
     for (auto& box : *boxes) {
-        //if (rayBoxIntersection(camPos, rayDir, box)) {
-        //    // Calculate the distance between the camera and the intersected box
-        //    Vector3f diff = box.position - camPos;
-        //    float distance = diff.norm();
+        if (rayBoxIntersection(camPos, rayDir, box)) {
+            // Calculate the distance between the camera and the intersected box
+            Vector3f diff = box.position - camPos;
+            float distance = diff.norm();
 
-        //    // Update the clicked box if this box is closer to the camera
-        //    if (distance < minIntersectionDistance) {
-        //        selection = &box;
-        //        minIntersectionDistance = distance;
-        //    }
-        //}
+            // Update the clicked box if this box is closer to the camera
+            if (distance < minIntersectionDistance) {
+                selection = &box;
+                minIntersectionDistance = distance;
+            }
+        }
     }
 
     // Remove the clicked box if any
@@ -329,6 +387,6 @@ void Scene::SelectBox(const Vector3f& camPos, const Vector3f& rayDir)
 void Scene::ApplyImpulse(const Vector3f& impulse)
 {
     for (auto& box : *boxes) {
-        //box.velocity += impulse;
+        box.velocity += impulse;
     }
 }

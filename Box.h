@@ -1,4 +1,6 @@
 #pragma once
+#include "constants.h"
+#include <Dense>
 
 using Eigen::Vector3f;
 
@@ -11,13 +13,18 @@ struct Box {
     bool active;
     Box()
     {
-        Box(Vector3f::Zero(), Vector3f::Ones(), Vector3f::Zero(), Vector3f::Zero());
+        this->position = Vector3f::Zero();
+        this->size = Vector3f::Ones();
+        this->velocity = Vector3f::Zero();
+        this->colour = Vector3f::Zero();
     }
-    Box(const Vector3f& position, const Vector3f& size, const Vector3f& velocity, const Vector3f& colour)
+    Box(const Vector3f& position, const Vector3f& velocity, const Vector3f& colour)
     {
         this->position = position;
-        this->size = size;
+        this->size = Vector3f::Ones();
         this->velocity = velocity;
         this->colour = colour;
     }
 };
+
+typedef std::array<Box, BOX_COUNT> BoxArray;

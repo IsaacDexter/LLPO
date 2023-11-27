@@ -1,17 +1,16 @@
 #pragma once
 
 #include "stdafx.h"
-#include <thread>
-#include <algorithm>
+#include "Box.h"
+#include "UpdateThread.h"
 
-typedef std::array<int, NUMBER_OF_BOXES> BoxArray;
+#define GRAVITY -19.81f
 
 class Scene
 {
 private:
-	// gravity - change it and see what happens (usually negative!)
-	const float gravity = -19.81f;
 	BoxArray* boxes;
+	ThreadArray* threads;
 public:
 	Scene();
 	~Scene();
@@ -33,7 +32,7 @@ public:
 	void Draw();
 	void Update(const double deltaTime);
 
-	void DistributeUpdate(const double deltaTime, const unsigned int threadCount);
-	void UpdateSection(const double deltaTime, BoxArray::iterator start, BoxArray::iterator end);
+	void DistributeUpdate();
+	//void UpdateSection(const double deltaTime, BoxArray::iterator start, BoxArray::iterator end);
 };
 

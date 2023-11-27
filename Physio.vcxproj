@@ -195,6 +195,7 @@
     <ClCompile Include="MemoryManager.cpp" />
     <ClCompile Include="Physio.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="UpdateThread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Box.h" />
@@ -206,6 +207,7 @@
     <ClInclude Include="Physio.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="UpdateThread.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

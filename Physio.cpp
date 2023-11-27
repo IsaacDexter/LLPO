@@ -123,7 +123,7 @@ void Physio::OnKeyDown(const int key)
     }
     case 'c':
     {
-        printf_s("Boxes = %i\n", NUMBER_OF_BOXES);
+        printf_s("Boxes = %i\n", BOX_COUNT);
         break;
     }
     case GLUT_KEY_ESCAPE:    //Escape to exit the game
