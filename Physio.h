@@ -12,7 +12,7 @@ namespace Physio
 	void Init(int argc, char** argv);
 
 	void Idle();
-	void Update(const float deltaTime);
+	void Update();
 	void Draw();
 
 	void Close();

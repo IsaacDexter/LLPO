@@ -191,23 +191,25 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DeltaTime.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MemoryManager.cpp" />
     <ClCompile Include="Physio.cpp" />
     <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="UpdateThread.cpp" />
+    <ClCompile Include="BoxThreadManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Box.h" />
     <ClInclude Include="callbacks.h" />
     <ClInclude Include="constants.h" />
+    <ClInclude Include="DeltaTime.h" />
     <ClInclude Include="FPSCounter.h" />
     <ClInclude Include="MemoryManager.h" />
     <ClInclude Include="MemoryTracker.h" />
     <ClInclude Include="Physio.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="UpdateThread.h" />
+    <ClInclude Include="BoxThreadManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -24,6 +24,7 @@
 
 #include "Box.h"
 #include "constants.h"
+#include "DeltaTime.h"
 
 #include "MemoryManager.h"
 #include "MemoryTracker.h"

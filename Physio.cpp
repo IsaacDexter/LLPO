@@ -1,6 +1,7 @@
 #include "Physio.h"
 #include "Scene.h"
 #include "callbacks.h"
+#include "constants.h"
 
 static Scene* g_scene = nullptr;
 static steady_clock::time_point g_last;
@@ -46,19 +47,19 @@ void Physio::Idle()
 {
     auto now = steady_clock::now();
     const duration<float> frameTime = now - g_last;
-    const float deltaTime = frameTime.count();
+    g_deltaTime = frameTime.count();
     g_last = steady_clock::now();
 
-    FPSCounter::ShowFPS(deltaTime);
+    FPSCounter::ShowFPS(g_deltaTime);
 
-    Update(deltaTime);
+    Update();
 
     glutPostRedisplay();
 }
 
-void Physio::Update(const float deltaTime)
+void Physio::Update()
 {
-    g_scene->Update(deltaTime);
+    g_scene->Update();
 }
 
 void Physio::Draw()

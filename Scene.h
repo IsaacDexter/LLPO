@@ -2,7 +2,7 @@
 
 #include "stdafx.h"
 #include "Box.h"
-#include "UpdateThread.h"
+#include "BoxThreadManager.h"
 
 #define GRAVITY -19.81f
 
@@ -10,7 +10,6 @@ class Scene
 {
 private:
 	BoxArray* boxes;
-	ThreadArray* threads;
 public:
 	Scene();
 	~Scene();
@@ -30,9 +29,7 @@ public:
 
 	void Init();
 	void Draw();
-	void Update(const double deltaTime);
-
-	void DistributeUpdate();
+	void Update();
 	//void UpdateSection(const double deltaTime, BoxArray::iterator start, BoxArray::iterator end);
 };
 
