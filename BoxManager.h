@@ -3,43 +3,26 @@
 #include <array>
 #include <thread>
 #include <mutex>
-#include <concurrent_queue.h>
+#include <condition_variable>
 #include "stdafx.h"
-#include <functional>
 
-class BoxThread
-{
-private:
-	BoxArray::iterator start;
-	BoxArray::iterator end;
-	std::thread thread;
-	std::function<void()>* completeCall;
-	bool update;
-public:
-	BoxThread();
-	void Create(BoxArray::iterator start, BoxArray::iterator end, std::function<void()>* completeCall);
-	void Start();
-	void UpdateScene();
-	void Update()
-	{
-		update = true;
-	}
-};
+class BoxThread;
 
-typedef std::array<BoxThread, THREAD_COUNT> ThreadArray;
+
 
 class BoxManager
 {
 private:
 	BoxArray* boxes;
-	ThreadArray* threads;
-	std::pair<std::mutex, int> completedThreads;
-	void UpdateThreads();
+
+	std::mutex mutex;
+	std::condition_variable isUpdated;
+
+	int completedThreads = 0;
 public:
 	BoxManager();
+	void CreateThreads();
 	void StartThreads();
-	void CreateThreads(BoxArray* boxes);
-	void MarkUpdateComplete();
 
 	Vector3f ScreenToWorld(const double x, const double y);
 	bool rayBoxIntersection(const Vector3f& rayOrigin, const Vector3f& rayDirection, const Box& box);
@@ -55,6 +38,8 @@ public:
 	void ApplyImpulse(const Vector3f& impulse);
 
 	void Init();
+	void Update();
+	void UpdateScene(BoxArray::iterator start, BoxArray::iterator end, int id);
 	void Draw();
 	void CheckCollisions();
 };

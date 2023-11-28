@@ -1,148 +1,40 @@
 #include "BoxManager.h"
 #include "Physio.h"
 
+static steady_clock::time_point g_last;
+
 BoxManager::BoxManager()
 {
     boxes = new BoxArray();
-    threads = new ThreadArray();
-    completedThreads.second = 0;
+    completedThreads = -1;
+    g_last = steady_clock::now();   //store initial time for deltaTime;
 }
 
-void BoxManager::StartThreads()
-{
-    for (auto& thread : *threads)
-    {
-        thread.Start();
-    }
-}
-
-void BoxManager::UpdateThreads()
-{
-    //Called when all the previous threads have updated
-    //Sync deltaTime
-    Physio::Update();
-    //Start the threads' next update
-    for (auto& thread : *threads)
-    {
-        thread.Update();
-    }
-
-}
-
-void BoxManager::CreateThreads(BoxArray* boxes)
+void BoxManager::CreateThreads()
 {
     //early out with empty box array/no threads to prevent throws from -1 or /0 errors
-    if (boxes->size() == 0 || threads->size() == 0)
+    if (boxes->size() == 0 || THREAD_COUNT == 0)
     {
         return;
     }
 
     //Calculate how much of the cubes each thread will iterate through
     const int totalSize = boxes->size();
-    const unsigned int sectionSize = totalSize / threads->size();
+    const unsigned int sectionSize = totalSize / THREAD_COUNT;
     //Caclulate how much additional load the first thread will have to carry
-    unsigned int remainder = totalSize - sectionSize * threads->size();
+    unsigned int remainder = totalSize - sectionSize * THREAD_COUNT;
 
+    //An iterator to the end of the list each thread can iterate over
     auto end = boxes->begin();
 
-    std::function<void()>* completeCall = new std::function<void()>();
-    *completeCall = [this] { OutputDebugStringA("Update complete!\n"); this->MarkUpdateComplete(); };
-
     //Assign the first thread
-    for (auto& thread : *threads)
+    for (size_t id = 0; id < THREAD_COUNT; id++)
     {
         auto start = end;
         //Calculate at which iterator to end this thread
         end += sectionSize + remainder;
-        //Spin up the thread, including the remainder
-        thread.Create(start, end, completeCall);
-        //Set the remainder to 0, to prevent anything but the first thread from using it
-        remainder = 0;
-    }
-}
-
-void BoxManager::MarkUpdateComplete()
-{
-    //Called when each thread completes its update
-    //Stop other threads from incrementing until this check is complete
-    completedThreads.first.lock();
-    completedThreads.second++;
-    //If that was the final thread to complete its update
-    if (completedThreads.second >= threads->size())
-    {
-        OutputDebugStringA("Both updates complete!\n");
-        completedThreads.second = 0;
-        //Handle collisions before unlocking threads
-        CheckCollisions();
-        //Have the threads update again
-        completedThreads.first.unlock();
-        UpdateThreads();
-        return;
-    }
-    completedThreads.first.unlock();
-}
-
-BoxThread::BoxThread()
-{
-    this->update = false;
-}
-
-void BoxThread::Create(BoxArray::iterator start, BoxArray::iterator end, std::function<void()>* completeCall)
-{
-    this->start = start;
-    this->end = end;
-    this->update = true;
-    thread = std::thread(&BoxThread::UpdateScene, this);
-    this->completeCall = completeCall;
-}
-
-void BoxThread::Start()
-{
-    thread.detach();
-}
-
-void BoxThread::UpdateScene()
-{
-    while (true)
-    {
-        if (update)
-        {
-            const float floorY = 0.0f;
-
-            //char buffer[100];
-            //sprintf_s(buffer, "DeltaTime = %f\n", deltaTime);
-            //OutputDebugStringA(buffer);
-
-            for (auto box = start; box != end; box++)
-            {
-                if (!box->active)
-                {
-                    continue;
-                }
-
-                box->velocity.y() += GRAVITY * g_deltaTime;
-                // Update position based on velocity
-                box->position += box->velocity * g_deltaTime;
-
-                // Check for collision with the floor
-                if (box->position.y() - box->size.y() / 2.0f < floorY) {
-                    box->position.y() = floorY + box->size.y() / 2.0f;
-                    float dampening = 0.7f;
-                    box->velocity.y() = -box->velocity.y() * dampening;
-                }
-
-                // Check for collision with the walls
-                if (box->position.x() - box->size.x() / 2.0f < minX || box->position.x() + box->size.x() / 2.0f > maxX) {
-                    box->velocity.x() = -box->velocity.x();
-                }
-                if (box->position.z() - box->size.z() / 2.0f < minZ || box->position.z() + box->size.z() / 2.0f > maxZ) {
-                    box->velocity.z() = -box->velocity.z();
-                }
-            }
-            update = false;
-            //Mark in the thread manager that the thread is complete
-            (*completeCall)();
-        }
+        //create up the thread, including the remainder
+        std::thread(&BoxManager::UpdateScene, this, start, end, id).detach();
     }
 }
 
@@ -168,8 +60,93 @@ void BoxManager::Init()
     }
     
     //Initialize thread manager
-    CreateThreads(boxes);
-    StartThreads();
+    CreateThreads();
+}
+
+void BoxManager::Update()
+{
+    //Indicate to update thread that main is ready for an update
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        completedThreads = 0;
+    }
+
+    isUpdated.notify_all();
+
+    //Wait for UpdateThread
+    {
+        std::unique_lock<std::mutex> lock(mutex);
+        isUpdated.wait(lock, [this] {return completedThreads == THREAD_COUNT; });
+    }
+    
+    OutputDebugStringA("MainThread::Update();\n");
+
+    //Recalculate deltaTime
+    {
+        auto now = steady_clock::now();
+        const duration<float> frameTime = now - g_last;
+        g_deltaTime = frameTime.count();
+        g_last = steady_clock::now();
+
+        FPSCounter::ShowFPS(g_deltaTime);
+    }
+
+    CheckCollisions();
+
+    glutPostRedisplay();
+}
+
+
+void BoxManager::UpdateScene(BoxArray::iterator start, BoxArray::iterator end, int id)
+{
+    const float floorY = 0.0f;
+    while (true)
+    {
+        std::unique_lock<std::mutex> lock(mutex);
+        //Wait until all threads aren't completed i.e., update isn't complete i.e., postupdate has been handled
+        isUpdated.wait(lock, [this] {return completedThreads < THREAD_COUNT; });
+        //Update the scene
+
+        char buffer[100];
+        sprintf_s(buffer, "Thread%i::Update();\n", id);
+        OutputDebugStringA(buffer);
+
+        for (auto box = start; box != end; box++)
+        {
+            if (!box->active)
+            {
+                continue;
+            }
+
+            box->velocity.y() += GRAVITY * g_deltaTime;
+            // Update position based on velocity
+            box->position += box->velocity * g_deltaTime;
+
+
+            // Check for collision with the floor
+            if (box->position.y() - box->size.y() / 2.0f < floorY) {
+                box->position.y() = floorY + box->size.y() / 2.0f;
+                float dampening = 0.7f;
+                box->velocity.y() = -box->velocity.y() * dampening;
+            }
+
+            // Check for collision with the walls
+            if (box->position.x() - box->size.x() / 2.0f < minX || box->position.x() + box->size.x() / 2.0f > maxX) {
+                box->velocity.x() = -box->velocity.x();
+            }
+            if (box->position.z() - box->size.z() / 2.0f < minZ || box->position.z() + box->size.z() / 2.0f > maxZ) {
+                box->velocity.z() = -box->velocity.z();
+            }
+        }
+        
+
+        //inform main that update is complete
+        completedThreads++;
+
+        //Unlock manually before notifying, to avoid waking up waiting thread just to block again.
+        lock.unlock();
+        isUpdated.notify_one();
+    }
 }
 
 void BoxManager::Draw()
@@ -263,54 +240,6 @@ void BoxManager::CheckCollisions()
     //    }
     //}
 }
-
-//void BoxManager::UpdateSection(const double deltaTime, BoxArray::iterator box, BoxArray::iterator end)
-//{
-//    const float floorY = 0.0f;
-//
-//    //char buffer[100];
-//    //sprintf_s(buffer, "DeltaTime = %f\n", deltaTime);
-//    //OutputDebugStringA(buffer);
-//
-//    for (;box != end; box++)
-//    {
-//        if (!box->active)
-//        {
-//            continue;
-//        }
-//        box->velocity.y() += GRAVITY * deltaTime;
-//
-//        // Update position based on velocity
-//        box->position.x() += box->velocity.x() * deltaTime;
-//        box->position.y() += box->velocity.y() * deltaTime;
-//        box->position.z() += box->velocity.z() * deltaTime;
-//
-//        // Check for collision with the floor
-//        if (box->position.y() - box->size.y() / 2.0f < floorY) {
-//            box->position.y() = floorY + box->size.y() / 2.0f;
-//            float dampening = 0.7f;
-//            box->velocity.y() = -box->velocity.y() * dampening;
-//        }
-//
-//        // Check for collision with the walls
-//        if (box->position.x() - box->size.x() / 2.0f < minX || box->position.x() + box->size.x() / 2.0f > maxX) {
-//            box->velocity.x() = -box->velocity.x();
-//        }
-//        if (box->position.z() - box->size.z() / 2.0f < minZ || box->position.z() + box->size.z() / 2.0f > maxZ) {
-//            box->velocity.z() = -box->velocity.z();
-//        }
-//
-//        // Check for collisions with other boxes
-//        for (Box& other : *boxes) {
-//            if (&*box == &other) continue;
-//            if (checkCollision(*box, other)) {
-//                resolveCollision(*box, other);
-//                break;
-//            }
-//        }
-//    }
-//}
-
 
 Vector3f BoxManager::ScreenToWorld(const double x, const double y)
 {

@@ -4,12 +4,11 @@
 #include "constants.h"
 
 static BoxManager* g_boxManager = nullptr;
-static steady_clock::time_point g_last;
 
 void Physio::Init(int argc, char** argv)
 {
     srand(static_cast<unsigned>(time(0))); // Seed random number generator
-    g_last = steady_clock::now();   //store initial time for deltaTime;
+    
 
     //Initialise GLUT
     bool success = true; 
@@ -45,23 +44,13 @@ void Physio::Init(int argc, char** argv)
 
 void Physio::Idle()
 {
-    
+    g_boxManager->Update();
 }
 
 void Physio::Update()
 {
-    g_boxManager->CheckCollisions();
 
-    auto now = steady_clock::now();
-    const duration<float> frameTime = now - g_last;
-    g_deltaTime = frameTime.count();
-    g_last = steady_clock::now();
 
-    FPSCounter::ShowFPS(g_deltaTime);
-
-    //Update();
-
-    glutPostRedisplay();
 }
 
 void Physio::Draw()
@@ -127,6 +116,11 @@ void Physio::OnKeyDown(const int key)
     case 'c':
     {
         printf_s("Boxes = %i\n", BOX_COUNT);
+        break;
+    }
+    case 't':
+    {
+        printf_s("Threads = %i\n", THREAD_COUNT);
         break;
     }
     case GLUT_KEY_ESCAPE:    //Escape to exit the game
