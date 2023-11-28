@@ -1,15 +1,152 @@
-#include "Scene.h"
+#include "BoxManager.h"
+#include "Physio.h"
 
-Scene::Scene()
+BoxManager::BoxManager()
 {
     boxes = new BoxArray();
+    threads = new ThreadArray();
+    completedThreads.second = 0;
 }
 
-Scene::~Scene()
+void BoxManager::StartThreads()
 {
+    for (auto& thread : *threads)
+    {
+        thread.Start();
+    }
 }
 
-void Scene::Init()
+void BoxManager::UpdateThreads()
+{
+    //Called when all the previous threads have updated
+    //Sync deltaTime
+    Physio::Update();
+    //Start the threads' next update
+    for (auto& thread : *threads)
+    {
+        thread.Update();
+    }
+
+}
+
+void BoxManager::CreateThreads(BoxArray* boxes)
+{
+    //early out with empty box array/no threads to prevent throws from -1 or /0 errors
+    if (boxes->size() == 0 || threads->size() == 0)
+    {
+        return;
+    }
+
+    //Calculate how much of the cubes each thread will iterate through
+    const int totalSize = boxes->size();
+    const unsigned int sectionSize = totalSize / threads->size();
+    //Caclulate how much additional load the first thread will have to carry
+    unsigned int remainder = totalSize - sectionSize * threads->size();
+
+    auto end = boxes->begin();
+
+    std::function<void()>* completeCall = new std::function<void()>();
+    *completeCall = [this] { OutputDebugStringA("Update complete!\n"); this->MarkUpdateComplete(); };
+
+    //Assign the first thread
+    for (auto& thread : *threads)
+    {
+        auto start = end;
+        //Calculate at which iterator to end this thread
+        end += sectionSize + remainder;
+        //Spin up the thread, including the remainder
+        thread.Create(start, end, completeCall);
+        //Set the remainder to 0, to prevent anything but the first thread from using it
+        remainder = 0;
+    }
+}
+
+void BoxManager::MarkUpdateComplete()
+{
+    //Called when each thread completes its update
+    //Stop other threads from incrementing until this check is complete
+    completedThreads.first.lock();
+    completedThreads.second++;
+    //If that was the final thread to complete its update
+    if (completedThreads.second >= threads->size())
+    {
+        OutputDebugStringA("Both updates complete!\n");
+        completedThreads.second = 0;
+        //Handle collisions before unlocking threads
+        CheckCollisions();
+        //Have the threads update again
+        completedThreads.first.unlock();
+        UpdateThreads();
+        return;
+    }
+    completedThreads.first.unlock();
+}
+
+BoxThread::BoxThread()
+{
+    this->update = false;
+}
+
+void BoxThread::Create(BoxArray::iterator start, BoxArray::iterator end, std::function<void()>* completeCall)
+{
+    this->start = start;
+    this->end = end;
+    this->update = true;
+    thread = std::thread(&BoxThread::UpdateScene, this);
+    this->completeCall = completeCall;
+}
+
+void BoxThread::Start()
+{
+    thread.detach();
+}
+
+void BoxThread::UpdateScene()
+{
+    while (true)
+    {
+        if (update)
+        {
+            const float floorY = 0.0f;
+
+            //char buffer[100];
+            //sprintf_s(buffer, "DeltaTime = %f\n", deltaTime);
+            //OutputDebugStringA(buffer);
+
+            for (auto box = start; box != end; box++)
+            {
+                if (!box->active)
+                {
+                    continue;
+                }
+
+                box->velocity.y() += GRAVITY * g_deltaTime;
+                // Update position based on velocity
+                box->position += box->velocity * g_deltaTime;
+
+                // Check for collision with the floor
+                if (box->position.y() - box->size.y() / 2.0f < floorY) {
+                    box->position.y() = floorY + box->size.y() / 2.0f;
+                    float dampening = 0.7f;
+                    box->velocity.y() = -box->velocity.y() * dampening;
+                }
+
+                // Check for collision with the walls
+                if (box->position.x() - box->size.x() / 2.0f < minX || box->position.x() + box->size.x() / 2.0f > maxX) {
+                    box->velocity.x() = -box->velocity.x();
+                }
+                if (box->position.z() - box->size.z() / 2.0f < minZ || box->position.z() + box->size.z() / 2.0f > maxZ) {
+                    box->velocity.z() = -box->velocity.z();
+                }
+            }
+            update = false;
+            //Mark in the thread manager that the thread is complete
+            (*completeCall)();
+        }
+    }
+}
+
+void BoxManager::Init()
 {
     for (auto &box: *boxes) 
     {
@@ -29,9 +166,13 @@ void Scene::Init()
         box.colour.y() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
         box.colour.z() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
     }
+    
+    //Initialize thread manager
+    CreateThreads(boxes);
+    StartThreads();
 }
 
-void Scene::Draw()
+void BoxManager::Draw()
 {
     // Draw the side wall
     GLfloat diffuseMaterial[] = { 0.2f, 0.2f, 0.2f, 1.0f };
@@ -71,49 +212,10 @@ void Scene::Draw()
     }
 }
 
-void Scene::Update()
+void BoxManager::CheckCollisions()
 {
-
-    //// Check for collisions between each box other boxes
-    //for (Box& box : *boxes) {
-    //    for (Box& other : *boxes) {
-    //        if (&box == &other) continue;
-    //        if (checkCollision(box, other)) {
-    //            resolveCollision(box, other);
-    //            break;
-    //        }
-    //    }
-    //}
-
-    const float floorY = 0.0f;
-
-    //char buffer[100];
-    //sprintf_s(buffer, "DeltaTime = %f\n", deltaTime);
-    //OutputDebugStringA(buffer);
-
+    // Check for collisions between each box other boxes
     for (Box& box : *boxes) {
-        // Update velocity due to gravity
-        box.velocity.y() += GRAVITY * g_deltaTime;
-
-        // Update position based on velocity
-        box.position += box.velocity * g_deltaTime;
-
-        // Check for collision with the floor
-        if (box.position.y() - box.size.y() / 2.0f < floorY) {
-            box.position.y() = floorY + box.size.y() / 2.0f;
-            float dampening = 0.7f;
-            box.velocity.y() = -box.velocity.y() * dampening;
-        }
-
-        // Check for collision with the walls
-        if (box.position.x() - box.size.x() / 2.0f < minX || box.position.x() + box.size.x() / 2.0f > maxX) {
-            box.velocity.x() = -box.velocity.x();
-        }
-        if (box.position.z() - box.size.z() / 2.0f < minZ || box.position.z() + box.size.z() / 2.0f > maxZ) {
-            box.velocity.z() = -box.velocity.z();
-        }
-
-        // Check for collisions with other boxes
         for (Box& other : *boxes) {
             if (&box == &other) continue;
             if (checkCollision(box, other)) {
@@ -122,9 +224,47 @@ void Scene::Update()
             }
         }
     }
+
+    //const float floorY = 0.0f;
+
+    ////char buffer[100];
+    ////sprintf_s(buffer, "DeltaTime = %f\n", deltaTime);
+    ////OutputDebugStringA(buffer);
+
+    //for (Box& box : *boxes) {
+    //    // Update velocity due to gravity
+    //    box.velocity.y() += GRAVITY * g_deltaTime;
+
+    //    // Update position based on velocity
+    //    box.position += box.velocity * g_deltaTime;
+
+    //    // Check for collision with the floor
+    //    if (box.position.y() - box.size.y() / 2.0f < floorY) {
+    //        box.position.y() = floorY + box.size.y() / 2.0f;
+    //        float dampening = 0.7f;
+    //        box.velocity.y() = -box.velocity.y() * dampening;
+    //    }
+
+    //    // Check for collision with the walls
+    //    if (box.position.x() - box.size.x() / 2.0f < minX || box.position.x() + box.size.x() / 2.0f > maxX) {
+    //        box.velocity.x() = -box.velocity.x();
+    //    }
+    //    if (box.position.z() - box.size.z() / 2.0f < minZ || box.position.z() + box.size.z() / 2.0f > maxZ) {
+    //        box.velocity.z() = -box.velocity.z();
+    //    }
+
+    //    // Check for collisions with other boxes
+    //    for (Box& other : *boxes) {
+    //        if (&box == &other) continue;
+    //        if (checkCollision(box, other)) {
+    //            resolveCollision(box, other);
+    //            break;
+    //        }
+    //    }
+    //}
 }
 
-//void Scene::UpdateSection(const double deltaTime, BoxArray::iterator box, BoxArray::iterator end)
+//void BoxManager::UpdateSection(const double deltaTime, BoxArray::iterator box, BoxArray::iterator end)
 //{
 //    const float floorY = 0.0f;
 //
@@ -172,7 +312,7 @@ void Scene::Update()
 //}
 
 
-Vector3f Scene::ScreenToWorld(const double x, const double y)
+Vector3f BoxManager::ScreenToWorld(const double x, const double y)
 {
     GLint viewport[4];
     GLdouble modelview[16];
@@ -195,7 +335,7 @@ Vector3f Scene::ScreenToWorld(const double x, const double y)
     return Vector3f((float)posX, (float)posY, (float)posZ);
 }
 
-bool Scene::rayBoxIntersection(const Vector3f& rayOrigin, const Vector3f& rayDirection, const Box& box)
+bool BoxManager::rayBoxIntersection(const Vector3f& rayOrigin, const Vector3f& rayDirection, const Box& box)
 {
     float tMin = (box.position.x() - box.size.x() / 2.0f - rayOrigin.x()) / rayDirection.x();
     float tMax = (box.position.x() + box.size.x() / 2.0f - rayOrigin.x()) / rayDirection.x();
@@ -227,7 +367,7 @@ bool Scene::rayBoxIntersection(const Vector3f& rayOrigin, const Vector3f& rayDir
     return true;
 }
 
-void Scene::resolveCollision(Box& a, Box& b)
+void BoxManager::resolveCollision(Box& a, Box& b)
 {
     Vector3f normal = { a.position.x() - b.position.x(), a.position.y() - b.position.y(), a.position.z() - b.position.z() };
     float length = std::sqrt(normal.x() * normal.x() + normal.y() * normal.y() + normal.z() * normal.z());
@@ -261,14 +401,14 @@ void Scene::resolveCollision(Box& a, Box& b)
     b.velocity.z() -= j * normal.z();
 }
 
-bool Scene::checkCollision(const Box& a, const Box& b)
+bool BoxManager::checkCollision(const Box& a, const Box& b)
 {
     return (std::abs(a.position.x() - b.position.x()) * 2 < (a.size.x() + b.size.x())) &&
         (std::abs(a.position.y() - b.position.y()) * 2 < (a.size.y() + b.size.y())) &&
         (std::abs(a.position.z() - b.position.z()) * 2 < (a.size.z() + b.size.z()));
 }
 
-void Scene::drawQuad(const Vector3f& v1, const Vector3f& v2, const Vector3f& v3, const Vector3f& v4)
+void BoxManager::drawQuad(const Vector3f& v1, const Vector3f& v2, const Vector3f& v3, const Vector3f& v4)
 {
     glBegin(GL_QUADS);
     glVertex3f(v1.x(), v1.y(), v1.z());
@@ -278,7 +418,7 @@ void Scene::drawQuad(const Vector3f& v1, const Vector3f& v2, const Vector3f& v3,
     glEnd();
 }
 
-void Scene::drawBox(const Box& box)
+void BoxManager::drawBox(const Box& box)
 {
     glPushMatrix();
     glTranslatef(box.position.x(), box.position.y(), box.position.z());
@@ -295,7 +435,7 @@ void Scene::drawBox(const Box& box)
     glPopMatrix();
 }
 
-void Scene::drawCube()
+void BoxManager::drawCube()
 {
     GLfloat vertices[] =
     {
@@ -318,7 +458,7 @@ void Scene::drawCube()
     glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void Scene::SelectBox(const Vector3f& camPos, const Vector3f& rayDir)
+void BoxManager::SelectBox(const Vector3f& camPos, const Vector3f& rayDir)
 {
     // Perform a ray-box intersection test and remove the clicked box
     float minIntersectionDistance = FLT_MAX;
@@ -345,7 +485,7 @@ void Scene::SelectBox(const Vector3f& camPos, const Vector3f& rayDir)
     }
 }
 
-void Scene::ApplyImpulse(const Vector3f& impulse)
+void BoxManager::ApplyImpulse(const Vector3f& impulse)
 {
     for (auto& box : *boxes) {
         box.velocity += impulse;

@@ -1,9 +1,9 @@
 #include "Physio.h"
-#include "Scene.h"
+#include "BoxManager.h"
 #include "callbacks.h"
 #include "constants.h"
 
-static Scene* g_scene = nullptr;
+static BoxManager* g_boxManager = nullptr;
 static steady_clock::time_point g_last;
 
 void Physio::Init(int argc, char** argv)
@@ -37,14 +37,21 @@ void Physio::Init(int argc, char** argv)
     gluPerspective(45.0, 800.0 / 600.0, 0.1, 100.0);
     glMatrixMode(GL_MODELVIEW);
 
-    g_scene = new Scene();
-    g_scene->Init();
+    g_boxManager = new BoxManager();
+    g_boxManager->Init();
 
     glutMainLoop();
 }
 
 void Physio::Idle()
 {
+    
+}
+
+void Physio::Update()
+{
+    g_boxManager->CheckCollisions();
+
     auto now = steady_clock::now();
     const duration<float> frameTime = now - g_last;
     g_deltaTime = frameTime.count();
@@ -52,14 +59,9 @@ void Physio::Idle()
 
     FPSCounter::ShowFPS(g_deltaTime);
 
-    Update();
+    //Update();
 
     glutPostRedisplay();
-}
-
-void Physio::Update()
-{
-    g_scene->Update();
 }
 
 void Physio::Draw()
@@ -69,7 +71,7 @@ void Physio::Draw()
 
     gluLookAt(LOOKAT_X, LOOKAT_Y, LOOKAT_Z, LOOKDIR_X, LOOKDIR_Y, LOOKDIR_Z, 0, 1, 0);
 
-    g_scene->Draw();
+    g_boxManager->Draw();
 
     glutSwapBuffers();
 }
@@ -90,14 +92,14 @@ void Physio::OnMouseButtonDown(const int button, const int x, const int y)
         Vector3f cameraDirection(LOOKDIR_X, LOOKDIR_Y, LOOKDIR_Z); // Replace with your actual camera direction
 
         // Get the world coordinates of the clicked point
-        Vector3f clickedWorldPos = g_scene->ScreenToWorld(x, y);
+        Vector3f clickedWorldPos = g_boxManager->ScreenToWorld(x, y);
 
         // Calculate the ray direction from the camera position to the clicked point
         Vector3f rayDirection = clickedWorldPos - cameraPosition;
         rayDirection.normalize();
 
         //selectBox
-        g_scene->SelectBox(cameraPosition, rayDirection);
+        g_boxManager->SelectBox(cameraPosition, rayDirection);
     }
 }
 
@@ -109,7 +111,7 @@ void Physio::OnKeyDown(const int key)
     {
     case ' ':
     {
-        g_scene->ApplyImpulse(impulse);
+        g_boxManager->ApplyImpulse(impulse);
         break;
     }
     case 'm':

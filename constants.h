@@ -22,4 +22,6 @@
 #define LOOKDIR_Z 0
 
 #define BOX_COUNT 50
-#define THREAD_COUNT 1
+#define THREAD_COUNT 4
+
+#define GRAVITY -19.81f

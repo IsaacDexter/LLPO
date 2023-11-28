@@ -195,8 +195,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MemoryManager.cpp" />
     <ClCompile Include="Physio.cpp" />
-    <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="BoxThreadManager.cpp" />
+    <ClCompile Include="BoxManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Box.h" />
@@ -207,9 +206,8 @@
     <ClInclude Include="MemoryManager.h" />
     <ClInclude Include="MemoryTracker.h" />
     <ClInclude Include="Physio.h" />
-    <ClInclude Include="Scene.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="BoxThreadManager.h" />
+    <ClInclude Include="BoxManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -5,7 +5,7 @@
 
 using namespace std::chrono;
 
-class Scene;
+class BoxManager;
 
 namespace Physio
 {
