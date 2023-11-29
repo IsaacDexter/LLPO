@@ -67,11 +67,12 @@ void BoxManager::Init()
 
 void BoxManager::Update()
 {
-    CheckCollisions();
+    //OutputDebugStringA("MainThread: Update started\n");
+    //std::this_thread::sleep_for(2000ms);
+//    CheckCollisions();
 
-    DeltaTime::UpdateDeltaTime();
-
-    glutPostRedisplay();
+    
+//    OutputDebugStringA("MainThread: Update completed\n");
 }
 
 
@@ -83,6 +84,12 @@ void BoxManager::UpdateScene(BoxArray::iterator start, BoxArray::iterator end, i
         //char buffer[100];
         //sprintf_s(buffer, "WorkerThread[%i]: Update started\n", id);
         //OutputDebugStringA(buffer);
+
+        ////delay each thread by variable amounts to ensure sync
+        //for (size_t i = 0; i <= id; i++)
+        //{
+        //    std::this_thread::sleep_for(2000ms);
+        //}
 
         //Update the scene
         for (auto box = start; box != end; box++)
@@ -111,12 +118,22 @@ void BoxManager::UpdateScene(BoxArray::iterator start, BoxArray::iterator end, i
             if (box->position.z() - box->size.z() / 2.0f < minZ || box->position.z() + box->size.z() / 2.0f > maxZ) {
                 box->velocity.z() = -box->velocity.z();
             }
+
+            
+            for (Box& other : *boxes) {
+                if (&(*box) == &other) continue;
+                if (checkCollision(*box, other)) {
+                    resolveCollision(*box, other);
+                    break;
+                }
+            }
         }
 
         //Increment the barrier and wait for the phase to complete before updating again
 
         //sprintf_s(buffer, "WorkerThread[%i]: Update complete, waiting...\n", id);
         //OutputDebugStringA(buffer);
+        //Update this thread's physics
         syncUpdate->arrive_and_wait();
     }
 }
@@ -163,16 +180,7 @@ void BoxManager::Draw()
 
 void BoxManager::CheckCollisions()
 {
-    // Check for collisions between each box other boxes
-    for (Box& box : *boxes) {
-        for (Box& other : *boxes) {
-            if (&box == &other) continue;
-            if (checkCollision(box, other)) {
-                resolveCollision(box, other);
-                break;
-            }
-        }
-    }
+    
 
     //const float floorY = 0.0f;
 
@@ -293,7 +301,7 @@ void BoxManager::resolveCollision(Box& a, Box& b)
     float dampening = 0.9f; // Dampening factor (0.9 = 10% energy reduction)
     float j = -(1.0f + e) * impulse * dampening;
 
-    // Apply the impulse to the boxes' velocities
+    // Apply the impulse only to the box owned by this thread's velocities
     a.velocity.x() += j * normal.x();
     a.velocity.y() += j * normal.y();
     a.velocity.z() += j * normal.z();

@@ -49,7 +49,9 @@ void Physio::Idle()
 
 void Physio::Update()
 {
-    g_boxManager->Update();
+    DeltaTime::UpdateDeltaTime();
+
+    glutPostRedisplay();
 }
 
 void Physio::Draw()
