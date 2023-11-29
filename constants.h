@@ -5,8 +5,6 @@
 #define minZ -30.0f
 #define maxZ 30.0f
 
-#define NUMBER_OF_BOXES 50
-
 #define WINDOW_X 1920
 #define WINDOW_Y 1080
 #define WINDOW_TITLE "Simple Physics Simulation"
@@ -22,3 +20,8 @@
 #define LOOKDIR_X 10
 #define LOOKDIR_Y 0
 #define LOOKDIR_Z 0
+
+#define BOX_COUNT 50
+#define THREAD_COUNT 2
+
+#define GRAVITY -19.81f

@@ -1,14 +1,14 @@
 #include "Physio.h"
-#include "Scene.h"
+#include "BoxManager.h"
 #include "callbacks.h"
+#include "constants.h"
 
-static Scene* g_scene = nullptr;
-static steady_clock::time_point g_last;
+static BoxManager* g_boxManager = nullptr;
 
 void Physio::Init(int argc, char** argv)
 {
     srand(static_cast<unsigned>(time(0))); // Seed random number generator
-    g_last = steady_clock::now();   //store initial time for deltaTime;
+    
 
     //Initialise GLUT
     bool success = true; 
@@ -36,29 +36,22 @@ void Physio::Init(int argc, char** argv)
     gluPerspective(45.0, 800.0 / 600.0, 0.1, 100.0);
     glMatrixMode(GL_MODELVIEW);
 
-    g_scene = new Scene();
-    g_scene->Init(NUMBER_OF_BOXES);
+    g_boxManager = new BoxManager();
+    g_boxManager->Init();
 
     glutMainLoop();
 }
 
 void Physio::Idle()
 {
-    auto now = steady_clock::now();
-    const duration<float> frameTime = now - g_last;
-    const float deltaTime = frameTime.count();
-    g_last = steady_clock::now();
-
-    FPSCounter::ShowFPS(deltaTime);
-
-    Update(deltaTime);
-
-    glutPostRedisplay();
+    //g_boxManager->Update();
 }
 
-void Physio::Update(const float deltaTime)
+void Physio::Update()
 {
-    g_scene->Update(deltaTime);
+    DeltaTime::UpdateDeltaTime();
+
+    glutPostRedisplay();
 }
 
 void Physio::Draw()
@@ -68,9 +61,10 @@ void Physio::Draw()
 
     gluLookAt(LOOKAT_X, LOOKAT_Y, LOOKAT_Z, LOOKDIR_X, LOOKDIR_Y, LOOKDIR_Z, 0, 1, 0);
 
-    g_scene->Draw();
+    g_boxManager->Draw();
 
     glutSwapBuffers();
+
 }
 
 void Physio::Close()
@@ -89,14 +83,14 @@ void Physio::OnMouseButtonDown(const int button, const int x, const int y)
         Vector3f cameraDirection(LOOKDIR_X, LOOKDIR_Y, LOOKDIR_Z); // Replace with your actual camera direction
 
         // Get the world coordinates of the clicked point
-        Vector3f clickedWorldPos = g_scene->ScreenToWorld(x, y);
+        Vector3f clickedWorldPos = g_boxManager->ScreenToWorld(x, y);
 
         // Calculate the ray direction from the camera position to the clicked point
         Vector3f rayDirection = clickedWorldPos - cameraPosition;
         rayDirection.normalize();
 
         //selectBox
-        g_scene->SelectBox(cameraPosition, rayDirection);
+        g_boxManager->SelectBox(cameraPosition, rayDirection);
     }
 }
 
@@ -108,7 +102,7 @@ void Physio::OnKeyDown(const int key)
     {
     case ' ':
     {
-        g_scene->ApplyImpulse(impulse);
+        g_boxManager->ApplyImpulse(impulse);
         break;
     }
     case 'm':
@@ -123,7 +117,12 @@ void Physio::OnKeyDown(const int key)
     }
     case 'c':
     {
-        printf_s("Boxes = %i\n", NUMBER_OF_BOXES);
+        printf_s("Boxes = %i\n", BOX_COUNT);
+        break;
+    }
+    case 't':
+    {
+        printf_s("Threads = %i\n", THREAD_COUNT);
         break;
     }
     case GLUT_KEY_ESCAPE:    //Escape to exit the game
