@@ -6,6 +6,8 @@
 #include <condition_variable>
 #include "stdafx.h"
 #include <numeric>
+#include <barrier>
+#include <functional>
 
 class BoxThread;
 
@@ -15,10 +17,9 @@ class BoxManager
 {
 private:
 	BoxArray* boxes;
-
-	std::array<bool, THREAD_COUNT>* locks;
-	std::mutex completeCountMutex;
-	int completeCount = 0;
+	//Pass pointer-to-function type as the template argument, not the actual function
+	//Noexcept as barrier requires a callable that is nothrow invocable
+	std::barrier<void(*)(void) noexcept>* syncUpdate;
 public:
 	BoxManager();
 	void CreateThreads();
@@ -39,7 +40,7 @@ public:
 
 	void Init();
 	void Update();
-	void UpdateScene(BoxArray::iterator start, BoxArray::iterator end, bool* lock, int id);
+	void UpdateScene(BoxArray::iterator start, BoxArray::iterator end, int id);
 	void Draw();
 	void CheckCollisions();
 };

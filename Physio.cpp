@@ -44,7 +44,7 @@ void Physio::Init(int argc, char** argv)
 
 void Physio::Idle()
 {
-    g_boxManager->Update();
+    //g_boxManager->Update();
 }
 
 void Physio::Update()
