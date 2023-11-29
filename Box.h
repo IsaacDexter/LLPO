@@ -17,6 +17,7 @@ struct Box {
         this->size = Vector3f::Ones();
         this->velocity = Vector3f::Zero();
         this->colour = Vector3f::Zero();
+        active = true;
     }
     Box(const Vector3f& position, const Vector3f& velocity, const Vector3f& colour)
     {
@@ -24,6 +25,7 @@ struct Box {
         this->size = Vector3f::Ones();
         this->velocity = velocity;
         this->colour = colour;
+        active = true;
     }
 };
 

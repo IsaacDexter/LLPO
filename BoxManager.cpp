@@ -6,7 +6,8 @@ static steady_clock::time_point g_last;
 BoxManager::BoxManager()
 {
     boxes = new BoxArray();
-    completedThreads = -1;
+    locks = new std::array<bool, THREAD_COUNT>();
+    locks->fill(true);
     g_last = steady_clock::now();   //store initial time for deltaTime;
 }
 
@@ -33,9 +34,13 @@ void BoxManager::CreateThreads()
         auto start = end;
         //Calculate at which iterator to end this thread
         end += sectionSize + remainder;
-        //create up the thread, including the remainder
-        std::thread(&BoxManager::UpdateScene, this, start, end, id).detach();
+        //create up the thread, including the remainder, it will be initially locked
+        std::thread(&BoxManager::UpdateScene, this, start, end, &(locks->at(id)), id).detach();
+        remainder = 0;
     }
+
+    //Set the threads going
+    locks->fill(false);
 }
 
 void BoxManager::Init()
@@ -57,6 +62,8 @@ void BoxManager::Init()
         box.colour.x() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
         box.colour.y() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
         box.colour.z() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+
+        box.active = true;
     }
     
     //Initialize thread manager
@@ -65,22 +72,17 @@ void BoxManager::Init()
 
 void BoxManager::Update()
 {
-    //Indicate to update thread that main is ready for an update
+    //Wait until all the threads are completed
+    do
     {
-        std::lock_guard<std::mutex> lock(mutex);
-        completedThreads = 0;
-    }
+        std::lock_guard<std::mutex> lock(completeCountMutex);
+    } while (completeCount < THREAD_COUNT);
+    //Once they are, finish the update
 
-    isUpdated.notify_all();
-
-    //Wait for UpdateThread
-    {
-        std::unique_lock<std::mutex> lock(mutex);
-        isUpdated.wait(lock, [this] {return completedThreads == THREAD_COUNT; });
-    }
-    
     OutputDebugStringA("MainThread::Update();\n");
 
+
+    completeCount = 0;
     //Recalculate deltaTime
     {
         auto now = steady_clock::now();
@@ -94,18 +96,23 @@ void BoxManager::Update()
     CheckCollisions();
 
     glutPostRedisplay();
+
+    //Reset the threads so they may update once more
+    locks->fill(false);
 }
 
 
-void BoxManager::UpdateScene(BoxArray::iterator start, BoxArray::iterator end, int id)
+void BoxManager::UpdateScene(BoxArray::iterator start, BoxArray::iterator end, bool* lock, int id)
 {
     const float floorY = 0.0f;
     while (true)
     {
-        std::unique_lock<std::mutex> lock(mutex);
-        //Wait until all threads aren't completed i.e., update isn't complete i.e., postupdate has been handled
-        isUpdated.wait(lock, [this] {return completedThreads < THREAD_COUNT; });
-        //Update the scene
+        //Wait until the thread is unlocked...
+        while (*lock)
+        {
+
+        }
+        //when it is, update the scene
 
         char buffer[100];
         sprintf_s(buffer, "Thread%i::Update();\n", id);
@@ -139,13 +146,12 @@ void BoxManager::UpdateScene(BoxArray::iterator start, BoxArray::iterator end, i
             }
         }
         
-
-        //inform main that update is complete
-        completedThreads++;
-
-        //Unlock manually before notifying, to avoid waking up waiting thread just to block again.
-        lock.unlock();
-        isUpdated.notify_one();
+        //lock this thread so it can update again until main allows it
+        *lock = true;
+        {
+            std::lock_guard<std::mutex> lock(completeCountMutex);
+            completeCount++;
+        }
     }
 }
 

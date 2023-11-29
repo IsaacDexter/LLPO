@@ -5,6 +5,7 @@
 #include <mutex>
 #include <condition_variable>
 #include "stdafx.h"
+#include <numeric>
 
 class BoxThread;
 
@@ -15,10 +16,9 @@ class BoxManager
 private:
 	BoxArray* boxes;
 
-	std::mutex mutex;
-	std::condition_variable isUpdated;
-
-	int completedThreads = 0;
+	std::array<bool, THREAD_COUNT>* locks;
+	std::mutex completeCountMutex;
+	int completeCount = 0;
 public:
 	BoxManager();
 	void CreateThreads();
@@ -39,7 +39,7 @@ public:
 
 	void Init();
 	void Update();
-	void UpdateScene(BoxArray::iterator start, BoxArray::iterator end, int id);
+	void UpdateScene(BoxArray::iterator start, BoxArray::iterator end, bool* lock, int id);
 	void Draw();
 	void CheckCollisions();
 };
