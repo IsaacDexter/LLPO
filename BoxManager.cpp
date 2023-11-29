@@ -1,14 +1,11 @@
 #include "BoxManager.h"
 #include "Physio.h"
 
-static steady_clock::time_point g_last;
-
 BoxManager::BoxManager()
 {
     boxes = new BoxArray();
-    g_last = steady_clock::now();   //store initial time for deltaTime;
 
-    auto onCompleteion = []() noexcept { OutputDebugStringA("MainThread: Update started\n");  std::this_thread::sleep_for(2000ms); OutputDebugStringA("MainThread Update complete, waiting...\n"); };
+    auto onCompleteion = []() noexcept { Physio::Update(); };
     syncUpdate = new std::barrier<void(*)(void) noexcept>(THREAD_COUNT, onCompleteion);
 }
 
@@ -70,22 +67,11 @@ void BoxManager::Init()
 
 void BoxManager::Update()
 {
-    //Wait until all the threads are completed
-    OutputDebugStringA("MainThread::Update();\n");
+    CheckCollisions();
 
-    ////Recalculate deltaTime
-    //{
-    //    auto now = steady_clock::now();
-    //    const duration<float> frameTime = now - g_last;
-    //    g_deltaTime = frameTime.count();
-    //    g_last = steady_clock::now();
+    DeltaTime::UpdateDeltaTime();
 
-    //    FPSCounter::ShowFPS(g_deltaTime);
-    //}
-
-    //CheckCollisions();
-
-    //glutPostRedisplay();
+    glutPostRedisplay();
 }
 
 
@@ -94,45 +80,43 @@ void BoxManager::UpdateScene(BoxArray::iterator start, BoxArray::iterator end, i
     const float floorY = 0.0f;
     while (true)
     {
-        char buffer[100];
-        sprintf_s(buffer, "WorkerThread[%i]: Update started\n", id);
-        OutputDebugStringA(buffer);
+        //char buffer[100];
+        //sprintf_s(buffer, "WorkerThread[%i]: Update started\n", id);
+        //OutputDebugStringA(buffer);
 
         //Update the scene
-        //for (auto box = start; box != end; box++)
-        //{
-        //    if (!box->active)
-        //    {
-        //        continue;
-        //    }
+        for (auto box = start; box != end; box++)
+        {
+            if (!box->active)
+            {
+                continue;
+            }
 
-        //    box->velocity.y() += GRAVITY * g_deltaTime;
-        //    // Update position based on velocity
-        //    box->position += box->velocity * g_deltaTime;
+            box->velocity.y() += GRAVITY * g_deltaTime;
+            // Update position based on velocity
+            box->position += box->velocity * g_deltaTime;
 
 
-        //    // Check for collision with the floor
-        //    if (box->position.y() - box->size.y() / 2.0f < floorY) {
-        //        box->position.y() = floorY + box->size.y() / 2.0f;
-        //        float dampening = 0.7f;
-        //        box->velocity.y() = -box->velocity.y() * dampening;
-        //    }
+            // Check for collision with the floor
+            if (box->position.y() - box->size.y() / 2.0f < floorY) {
+                box->position.y() = floorY + box->size.y() / 2.0f;
+                float dampening = 0.7f;
+                box->velocity.y() = -box->velocity.y() * dampening;
+            }
 
-        //    // Check for collision with the walls
-        //    if (box->position.x() - box->size.x() / 2.0f < minX || box->position.x() + box->size.x() / 2.0f > maxX) {
-        //        box->velocity.x() = -box->velocity.x();
-        //    }
-        //    if (box->position.z() - box->size.z() / 2.0f < minZ || box->position.z() + box->size.z() / 2.0f > maxZ) {
-        //        box->velocity.z() = -box->velocity.z();
-        //    }
-        //}
-
-        std::this_thread::sleep_for(2000ms);
+            // Check for collision with the walls
+            if (box->position.x() - box->size.x() / 2.0f < minX || box->position.x() + box->size.x() / 2.0f > maxX) {
+                box->velocity.x() = -box->velocity.x();
+            }
+            if (box->position.z() - box->size.z() / 2.0f < minZ || box->position.z() + box->size.z() / 2.0f > maxZ) {
+                box->velocity.z() = -box->velocity.z();
+            }
+        }
 
         //Increment the barrier and wait for the phase to complete before updating again
 
-        sprintf_s(buffer, "WorkerThread[%i]: Update complete, waiting...\n", id);
-        OutputDebugStringA(buffer);
+        //sprintf_s(buffer, "WorkerThread[%i]: Update complete, waiting...\n", id);
+        //OutputDebugStringA(buffer);
         syncUpdate->arrive_and_wait();
     }
 }

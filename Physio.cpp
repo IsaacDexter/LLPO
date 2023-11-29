@@ -49,8 +49,7 @@ void Physio::Idle()
 
 void Physio::Update()
 {
-
-
+    g_boxManager->Update();
 }
 
 void Physio::Draw()
@@ -63,6 +62,7 @@ void Physio::Draw()
     g_boxManager->Draw();
 
     glutSwapBuffers();
+
 }
 
 void Physio::Close()
