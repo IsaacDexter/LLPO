@@ -46,9 +46,26 @@ public:
 	}
 
 	//Ouputs the formatted stats of memory allocation in the program
-	static void OutputStats()
+	static inline void OutputStats()
 	{
 		printf("%s:\nBytes Allocated: %zu\nBytes Deallocated: %zu\nBytes Total: %zu\n", m_stats.category, m_stats.bytesAllocated, m_stats.bytesDeallocated, m_stats.bytes);
+	}
+
+	static inline void OutputHeader(Header* pHeader)
+	{
+		Footer* pFooter = (Footer*)((char*)pHeader + sizeof(Header) + pHeader->size);   //Find the pointer to the footer by finding the start of the content and adding the size of the content
+		std::cout << std::hex << pHeader << ":\n\tCheck: " << pHeader->check << "\n\tPrevious: "  << pHeader->pPrev << "\n\tNext: " << pHeader->pNext << "\n\tFooter: \n\t\t";
+		std::cout << pFooter << ": \n\t\tCheck: " << pFooter->check << "\n\tSize: " << std::dec << pHeader->size << "\n\n";
+	}
+
+	static inline void WalkHeap()
+	{
+		Header* pHeader = pFirst;
+		while (pHeader != nullptr)
+		{
+			OutputHeader(pHeader);
+			pHeader = pHeader->pNext;
+		}
 	}
 
 	MemoryTracker() = delete;
