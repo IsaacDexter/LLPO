@@ -125,6 +125,11 @@ void Physio::OnKeyDown(const int key)
         printf_s("Threads = %i\n", THREAD_COUNT);
         break;
     }
+    case 'h':
+    {
+        DefaultTracker::WalkHeap();
+        break;
+    }
     case GLUT_KEY_ESCAPE:    //Escape to exit the game
     {
         Close();
