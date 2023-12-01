@@ -199,9 +199,11 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Box.cpp" />
     <ClCompile Include="DeltaTime.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MemoryManager.cpp" />
+    <ClCompile Include="MemoryPool.cpp" />
     <ClCompile Include="Physio.cpp" />
     <ClCompile Include="BoxManager.cpp" />
   </ItemGroup>
@@ -212,6 +214,7 @@
     <ClInclude Include="DeltaTime.h" />
     <ClInclude Include="FPSCounter.h" />
     <ClInclude Include="MemoryManager.h" />
+    <ClInclude Include="MemoryPool.h" />
     <ClInclude Include="MemoryTracker.h" />
     <ClInclude Include="Physio.h" />
     <ClInclude Include="stdafx.h" />

@@ -1,8 +1,10 @@
 #pragma once
 #include "constants.h"
 #include <Dense>
+#include "MemoryPool.h"
 
 using Eigen::Vector3f;
+
 
 // the box (falling item)
 struct Box {
@@ -10,14 +12,12 @@ struct Box {
     Vector3f size;
     Vector3f velocity;
     Vector3f colour;
-    bool active;
     Box()
     {
         this->position = Vector3f::Zero();
         this->size = Vector3f::Ones();
         this->velocity = Vector3f::Zero();
         this->colour = Vector3f::Zero();
-        active = true;
     }
     Box(const Vector3f& position, const Vector3f& velocity, const Vector3f& colour)
     {
@@ -25,8 +25,10 @@ struct Box {
         this->size = Vector3f::Ones();
         this->velocity = velocity;
         this->colour = colour;
-        active = true;
     }
+    static void* operator new(size_t size);
+
+    static void operator delete(void* pMem, size_t size);
 };
 
-typedef std::array<Box, BOX_COUNT> BoxArray;
+extern MemoryPool<BOX_COUNT, sizeof(Box)> boxPool;
