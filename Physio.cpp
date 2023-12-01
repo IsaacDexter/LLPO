@@ -130,6 +130,16 @@ void Physio::OnKeyDown(const int key)
         DefaultTracker::WalkHeap();
         break;
     }
+    case 'p':
+    {
+        boxPool.Output();
+        break;
+    }
+    case 'n':
+    {
+        g_boxManager->AddBox();
+        break;
+    }
     case GLUT_KEY_ESCAPE:    //Escape to exit the game
     {
         Close();

@@ -8,8 +8,12 @@
 #include <numeric>
 #include <barrier>
 #include <functional>
+#include "MemoryPool.h"
 
 class BoxThread;
+
+
+typedef std::array<Box*, BOX_COUNT> BoxArray;
 
 
 
@@ -20,6 +24,7 @@ private:
 	//Pass pointer-to-function type as the template argument, not the actual function
 	//Noexcept as barrier requires a callable that is nothrow invocable
 	std::barrier<void(*)(void) noexcept>* syncUpdate;
+	inline void InitBox(Box* box);
 public:
 	BoxManager();
 	void CreateThreads();
@@ -39,6 +44,7 @@ public:
 	void ApplyImpulse(const Vector3f& impulse);
 
 	void Init();
+	void AddBox();
 	void Update();
 	void UpdateScene(BoxArray::iterator start, BoxArray::iterator end, int id);
 	void Draw();

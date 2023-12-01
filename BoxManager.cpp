@@ -1,6 +1,8 @@
 #include "BoxManager.h"
 #include "Physio.h"
 
+
+
 BoxManager::BoxManager()
 {
     boxes = new BoxArray();
@@ -43,26 +45,41 @@ void BoxManager::Init()
     for (auto &box: *boxes) 
     {
         //Initialize a new box
-        box = Box();
-
-        // Assign random x, y, and z positions within specified ranges
-        box.position.x() = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
-        box.position.y() = 10.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 1.0f));
-        box.position.z() = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
-
-        // Assign random x-velocity between -1.0f and 1.0f
-        box.velocity.x() = -1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 2.0f));;
-
-        // Assign a random color to the box
-        box.colour.x() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-        box.colour.y() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-        box.colour.z() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
-
-        box.active = true;
+        box = new Box();
+        InitBox(box);
     }
     
     //Initialize thread manager
     CreateThreads();
+}
+
+void BoxManager::AddBox()
+{
+    //find if theres space in the box array
+    auto it = std::find(boxes->begin(), boxes->end(), nullptr);
+    if (it == boxes->end())
+    {
+        std::cerr << "BoxManager:\tBox array full, could not add new box.\n";
+        return;
+    }
+    *it = new Box();
+    InitBox(*it);
+}
+
+inline void BoxManager::InitBox(Box* box)
+{
+    // Assign random x, y, and z positions within specified ranges
+    box->position.x() = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
+    box->position.y() = 10.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 1.0f));
+    box->position.z() = static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 20.0f));
+
+    // Assign random x-velocity between -1.0f and 1.0f
+    box->velocity.x() = -1.0f + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / 2.0f));;
+
+    // Assign a random color to the box
+    box->colour.x() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+    box->colour.y() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+    box->colour.z() = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 }
 
 void BoxManager::Update()
@@ -92,12 +109,10 @@ void BoxManager::UpdateScene(BoxArray::iterator start, BoxArray::iterator end, i
         //}
 
         //Update the scene
-        for (auto box = start; box != end; box++)
+        for (auto it = start; it != end; it++)
         {
-            if (!box->active)
-            {
-                continue;
-            }
+            auto box = *it;
+            if (box == nullptr) continue;
 
             box->velocity.y() += GRAVITY * g_deltaTime;
             // Update position based on velocity
@@ -120,10 +135,11 @@ void BoxManager::UpdateScene(BoxArray::iterator start, BoxArray::iterator end, i
             }
 
             
-            for (Box& other : *boxes) {
-                if (&(*box) == &other) continue;
-                if (checkCollision(*box, other)) {
-                    resolveCollision(*box, other);
+            for (auto& other : *boxes) {
+                if (&box == &other) continue;
+                if (other == nullptr) continue;
+                if (checkCollision(*box, *other)) {
+                    resolveCollision(*box, *other);
                     break;
                 }
             }
@@ -170,11 +186,8 @@ void BoxManager::Draw()
     drawQuad(backWallV1, backWallV2, backWallV3, backWallV4);
 
     for (const auto& box : *boxes) {
-        if (!box.active)
-        {
-            continue;
-        }
-        drawBox(box);
+        if (box == nullptr) continue;
+        drawBox(*box);
     }
 }
 
@@ -372,31 +385,38 @@ void BoxManager::SelectBox(const Vector3f& camPos, const Vector3f& rayDir)
     // Perform a ray-box intersection test and remove the clicked box
     float minIntersectionDistance = FLT_MAX;
 
-    Box* selection = nullptr;
-
-    for (auto& box : *boxes) {
-        if (rayBoxIntersection(camPos, rayDir, box)) {
+    auto selection = boxes->end();
+    for (auto it = boxes->begin(); it != boxes->end(); it++)
+    {
+        auto box = *it;
+        if (box == nullptr)
+        {
+            continue;
+        }
+        if (rayBoxIntersection(camPos, rayDir, *box)) {
             // Calculate the distance between the camera and the intersected box
-            Vector3f diff = box.position - camPos;
+            Vector3f diff = box->position - camPos;
             float distance = diff.norm();
 
             // Update the clicked box if this box is closer to the camera
             if (distance < minIntersectionDistance) {
-                selection = &box;
+                selection = it;
                 minIntersectionDistance = distance;
             }
         }
     }
 
     // Remove the clicked box if any
-    if (selection != nullptr) {
-        selection->active = false;
+    if (selection != boxes->end()) {
+        delete *selection;
+        *selection = nullptr;
     }
 }
 
 void BoxManager::ApplyImpulse(const Vector3f& impulse)
 {
     for (auto& box : *boxes) {
-        box.velocity += impulse;
+        box->velocity += impulse;
     }
 }
+
